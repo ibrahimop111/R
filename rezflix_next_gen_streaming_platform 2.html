@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RezFlix - Ultra Neon Monochrome Streaming</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#000000',
+                        charcoal: '#0a0a0c',
+                        cardBg: '#121215',
+                        neonWhite: '#ffffff',
+                        neonGlow: '#e2e8f0',
+                        neonMuted: '#94a3b8',
+                    },
+                    boxShadow: {
+                        'neon-white': '0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.15)',
+                        'neon-subtle': '0 0 10px rgba(255, 255, 255, 0.2)',
+                        'ambient-glow': '0 0 50px rgba(255, 255, 255, 0.25)',
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
+                        'shimmer': 'shimmer 3s infinite linear',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))' },
+                            '50%': { filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #000000;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffffff;
+            box-shadow: 0 0 10px #ffffff;
+        }
+
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(18, 18, 21, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Shimmering Chrome Logo */
+        .chrome-text {
+            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Number Badge Styling for Top 10 */
+        .top10-number {
+            font-size: 8rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #000;
+            -webkit-text-stroke: 3px #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+            user-select: none;
+        }
+
+        /* Ambient Glow Frame */
+        .ambient-backlight {
+            transition: all 0.5s ease;
+            box-shadow: 0 0 80px 20px rgba(255, 255, 255, 0.25);
+        }
+
+        /* Hide scrollbars for horizontal lists */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-black text-slate-100 min-h-screen flex flex-col selection:bg-white selection:text-black">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 md:px-8 py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 md:gap-4">
+            
+            <!-- Logo & Main Nav -->
+            <div class="flex items-center gap-6 shrink-0">
+                <a href="#" onclick="showSection('home')" class="flex items-center gap-2 group">
+                    <div class="w-9 h-9 rounded-lg bg-white text-black font-black text-xl flex items-center justify-center shadow-neon-white transition-transform group-hover:scale-105">R</div>
+                    <span class="text-2xl font-bold tracking-wider chrome-text hidden sm:inline-block">REZFLIX</span>
+                </a>
+                
+                <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-400">
+                    <button onclick="showSection('home')" class="hover:text-white transition-colors">Home</button>
+                    <button onclick="filterByMediaType('movie')" class="hover:text-white transition-colors">Movies</button>
+                    <button onclick="filterByMediaType('tv')" class="hover:text-white transition-colors">TV Series</button>
+                    <button onclick="filterByMediaType('anime')" class="hover:text-white transition-colors">Anime</button>
+                    <button onclick="showSection('watch-party')" class="hover:text-white transition-colors flex items-center gap-1.5 text-white font-semibold"><i data-lucide="users" class="w-4 h-4"></i> Party</button>
+                    <button onclick="showSection('hub')" class="hover:text-white transition-colors text-amber-300 flex items-center gap-1"><i data-lucide="sparkles" class="w-4 h-4"></i> Cine-Hub</button>
+                </nav>
+            </div>
+
+            <!-- Live Search Input -->
+            <div class="relative flex-1 max-w-md mx-2">
+                <div class="relative flex items-center">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 text-slate-400"></i>
+                    <input type="text" id="searchInput" placeholder="Search movies, TV, anime..." 
+                           oninput="handleLiveSearch(this.value)"
+                           class="w-full bg-slate-900/90 border border-white/15 rounded-full pl-9 pr-8 py-1.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all">
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 text-slate-400 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <!-- Dropdown Search Results -->
+                <div id="searchResultsDropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-charcoal/95 border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50 max-h-96 overflow-y-auto backdrop-blur-2xl">
+                    <div id="searchResultsList" class="divide-y divide-white/5"></div>
+                </div>
+            </div>
+
+            <!-- Right Controls & User Profile Button (Fixed Responsive Flex) -->
+            <div class="flex items-center gap-2 md:gap-3 shrink-0">
+                <!-- Soundscape Audio Toggle -->
+                <button onclick="toggleSoundscapeModal()" title="Cinematic Ambient Audio" class="p-2 rounded-full border border-white/10 hover:border-white/40 bg-slate-900 text-slate-300 hover:text-white transition-all">
+                    <i data-lucide="music" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Watchlist Quick Link -->
+                <button onclick="showSection('watchlist')" title="Watchlist" class="p-2 rounded-full border border-white/10 hover:border-white/40 bg-slate-900 text-slate-300 hover:text-white transition-all relative">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    <span id="watchlistCountBadge" class="absolute -top-1 -right-1 w-4 h-4 bg-white text-black text-[10px] font-bold rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+
+                <!-- Sign In / User Profile Button (Guaranteed to fit) -->
+                <div id="authContainer">
+                    <button onclick="openAuthModal()" id="loginBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-black font-semibold text-xs md:text-sm shadow-neon-white hover:bg-slate-200 transition-all">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                        <span>Sign In</span>
+                    </button>
+                    <div id="userProfileBtnContainer" class="hidden relative">
+                        <button onclick="toggleUserDropdown()" class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-900 border border-white/20 hover:border-white text-sm">
+                            <div id="userAvatar" class="w-6 h-6 rounded-full bg-white text-black font-bold flex items-center justify-center text-xs">U</div>
+                            <span id="userNameDisplay" class="max-w-[80px] md:max-w-[120px] truncate font-medium text-xs md:text-sm">User</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                        </button>
+                        <!-- User Dropdown Menu -->
+                        <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-charcoal border border-white/20 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl">
+                            <div class="px-3 py-2 border-b border-white/10 mb-1">
+                                <p id="dropdownUserEmail" class="text-xs text-slate-400 truncate">user@rezflix.com</p>
+                                <p id="dropdownUserBadge" class="text-[10px] text-emerald-400 font-bold uppercase mt-0.5">PRO Cinephile</p>
+                            </div>
+                            <button onclick="showSection('profile')" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-white/10 flex items-center gap-2"><i data-lucide="user-check" class="w-3.5 h-3.5"></i> Profile & Stats</button>
+                            <button onclick="exportUserData()" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-white/10 flex items-center gap-2"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export Watchlist</button>
+                            <button onclick="logout()" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-rose-500/20 text-rose-400 flex items-center gap-2"><i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6">
+
+        <!-- SECTION: HOME -->
+        <section id="section-home" class="space-y-10">
+            <!-- Hero Featured Banner -->
+            <div id="heroBanner" class="relative rounded-2xl overflow-hidden min-h-[380px] md:min-h-[480px] border border-white/10 bg-slate-900 flex items-end p-6 md:p-12 shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10"></div>
+                <img id="heroBgImg" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1600" alt="Hero" class="absolute inset-0 w-full h-full object-cover filter brightness-75 transition-all duration-700">
+                <div class="relative z-20 max-w-2xl space-y-4">
+                    <span id="heroTypeBadge" class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-white text-black uppercase tracking-wider">FEATURED</span>
+                    <h1 id="heroTitle" class="text-3xl md:text-5xl font-black tracking-tight text-white drop-shadow-md">Loading Featured...</h1>
+                    <p id="heroOverview" class="text-xs md:text-sm text-slate-300 line-clamp-3 leading-relaxed">Loading plot overview...</p>
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <button id="heroPlayBtn" onclick="" class="px-6 py-2.5 rounded-full bg-white text-black font-bold text-sm shadow-neon-white hover:bg-slate-200 transition-all flex items-center gap-2">
+                            <i data-lucide="play" class="w-4 h-4 fill-black"></i> Watch Now
+                        </button>
+                        <button id="heroTrailerBtn" onclick="" class="px-5 py-2.5 rounded-full bg-slate-900/80 border border-white/20 text-white font-semibold text-sm hover:border-white transition-all flex items-center gap-2 backdrop-blur-md">
+                            <i data-lucide="youtube" class="w-4 h-4"></i> Trailer
+                        </button>
+                        <button id="heroAddWatchlistBtn" onclick="" class="p-2.5 rounded-full bg-slate-900/80 border border-white/20 text-white hover:border-white transition-all backdrop-blur-md" title="Add to Watchlist">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Genre & Filters Matrix -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                        <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Filter by Genre
+                    </h3>
+                    <select id="yearFilterSelect" onchange="applyFilters()" class="bg-slate-900 border border-white/10 text-xs rounded-lg px-2.5 py-1 text-slate-300 focus:outline-none focus:border-white">
+                        <option value="">All Years</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                    </select>
+                </div>
+                <div id="genreChips" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                    <!-- Dynamic Genre Chips -->
+                </div>
+            </div>
+
+            <!-- TOP 10 MOVIES CAROUSEL (TMDB REAL-TIME) -->
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <span class="w-2 h-6 bg-white rounded-full inline-block"></span> TOP 10 MOVIES TODAY
+                    </h2>
+                    <span class="text-xs text-slate-400 font-mono">TMDB GLOBAL RANKINGS</span>
+                </div>
+                <div id="top10MoviesContainer" class="flex gap-6 overflow-x-auto no-scrollbar pb-4 pt-2 snap-x">
+                    <!-- Rendered Top 10 Movies -->
+                </div>
+            </section>
+
+            <!-- TOP 10 TV SERIES CAROUSEL (TMDB REAL-TIME) -->
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <span class="w-2 h-6 bg-slate-400 rounded-full inline-block"></span> TOP 10 SERIES TODAY
+                    </h2>
+                    <span class="text-xs text-slate-400 font-mono">TMDB GLOBAL RANKINGS</span>
+                </div>
+                <div id="top10SeriesContainer" class="flex gap-6 overflow-x-auto no-scrollbar pb-4 pt-2 snap-x">
+                    <!-- Rendered Top 10 Series -->
+                </div>
+            </section>
+
+            <!-- CONTINUE WATCHING TRACKER -->
+            <section id="continueWatchingSection" class="hidden space-y-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="clock" class="w-5 h-5 text-white"></i> Continue Watching
+                </h2>
+                <div id="continueWatchingList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+            </section>
+
+            <!-- TRENDING ANIME (ANILIST INTEGRATION) -->
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-slate-300"></i> Trending Anime (AniList)
+                    </h2>
+                </div>
+                <div id="trendingAnimeGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <!-- Anime Cards -->
+                </div>
+            </section>
+        </section>
+
+        <!-- SECTION: MEDIA PLAYER & DETAILS -->
+        <section id="section-player" class="hidden space-y-6">
+            <button onclick="showSection('home')" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors bg-slate-900 border border-white/10 px-3 py-1.5 rounded-full">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Catalog
+            </button>
+
+            <!-- Player Video Container -->
+            <div id="playerWrapper" class="relative w-full rounded-2xl overflow-hidden bg-black border border-white/20 shadow-2xl transition-all duration-300">
+                <!-- Ambient Backlight Overlay Simulator -->
+                <div id="ambientBacklight" class="absolute -inset-4 bg-white/10 opacity-0 blur-3xl pointer-events-none transition-opacity duration-500"></div>
+
+                <div class="aspect-video w-full bg-black relative">
+                    <iframe id="mediaIframe" class="w-full h-full relative z-10 border-0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+                </div>
+
+                <!-- Player Engine Controls Bar -->
+                <div class="bg-charcoal p-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs">
+                    <!-- Provider Source Switcher -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-slate-400 font-bold flex items-center gap-1"><i data-lucide="server" class="w-3.5 h-3.5"></i> Source:</span>
+                        <select id="sourceSelector" onchange="changeStreamingSource(this.value)" class="bg-slate-900 border border-white/20 text-white rounded-lg px-2.5 py-1 focus:outline-none focus:border-white">
+                            <option value="vidnest">VidNest (Fast HD)</option>
+                            <option value="vidsrc_to">VidSrc.to</option>
+                            <option value="vidlink">VidLink (Ad-Free)</option>
+                            <option value="vidsrc_icu">VidSrc.icu</option>
+                            <option value="superembed">SuperEmbed</option>
+                        </select>
+
+                        <!-- Cinema Ambient Backlight Glow Toggle -->
+                        <button onclick="toggleAmbientBacklight()" id="ambientBtn" class="px-2.5 py-1 rounded-lg border border-white/20 bg-slate-900 hover:bg-slate-800 text-slate-300 flex items-center gap-1.5 transition-colors">
+                            <i data-lucide="sun" class="w-3.5 h-3.5"></i> Ambient Glow
+                        </button>
+                    </div>
+
+                    <!-- Episode Selectors for TV/Anime -->
+                    <div id="episodeControls" class="hidden flex items-center gap-2">
+                        <label class="text-slate-400">S:</label>
+                        <select id="seasonSelect" onchange="onSeasonChange()" class="bg-slate-900 border border-white/20 text-white rounded-lg px-2 py-1"></select>
+                        <label class="text-slate-400">E:</label>
+                        <select id="episodeSelect" onchange="onEpisodeChange()" class="bg-slate-900 border border-white/20 text-white rounded-lg px-2 py-1"></select>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="startWatchPartyFromPlayer()" class="px-3 py-1 rounded-lg bg-white text-black font-bold flex items-center gap-1 hover:bg-slate-200">
+                            <i data-lucide="users" class="w-3.5 h-3.5"></i> Watch Party
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Title Info & Cast & Notes -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4">
+                <div class="lg:col-span-2 space-y-6">
+                    <div>
+                        <h1 id="playerMediaTitle" class="text-2xl md:text-4xl font-bold text-white">Media Title</h1>
+                        <div class="flex items-center gap-3 text-xs text-slate-400 mt-2">
+                            <span id="playerReleaseDate">2024</span>
+                            <span>•</span>
+                            <span id="playerRating" class="text-emerald-400 font-bold flex items-center gap-1"><i data-lucide="star" class="w-3 h-3 fill-emerald-400"></i> 8.5</span>
+                            <span>•</span>
+                            <span id="playerGenres" class="text-slate-300">Action, Sci-Fi</span>
+                        </div>
+                    </div>
+
+                    <p id="playerOverview" class="text-sm text-slate-300 leading-relaxed">Detailed synopsis goes here...</p>
+
+                    <!-- Cast & Crew Carousel -->
+                    <div class="space-y-3">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400">Featured Cast</h3>
+                        <div id="castCarousel" class="flex gap-4 overflow-x-auto no-scrollbar py-2">
+                            <!-- Dynamic Cast Cards -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Journal / Private Notes -->
+                <div class="glass-card p-5 rounded-2xl space-y-4">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="notebook" class="w-4 h-4"></i> Personal Cinephile Journal
+                    </h3>
+                    <textarea id="mediaNoteInput" rows="4" placeholder="Write your thoughts, plot details, or review..." class="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-white"></textarea>
+                    <button onclick="saveMediaNote()" class="w-full py-2 rounded-xl bg-white text-black font-bold text-xs shadow-neon-white hover:bg-slate-200 transition-all">
+                        Save Note to Profile
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: WATCH PARTY (REAL-TIME SYNC SIMULATOR) -->
+        <section id="section-watch-party" class="hidden space-y-6">
+            <div class="max-w-4xl mx-auto glass-card p-6 md:p-8 rounded-2xl space-y-6 border border-white/20">
+                <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i data-lucide="users" class="w-6 h-6"></i> Watch Together Room</h2>
+                        <p class="text-xs text-slate-400">Sync playback real-time with friends worldwide.</p>
+                    </div>
+                    <div id="roomStatusBadge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+                        ROOM ACTIVE
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Room Controls -->
+                    <div class="space-y-4 md:col-span-1">
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Room Code</label>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="partyRoomCode" value="REZ-8942" readonly class="bg-slate-900 border border-white/20 rounded-lg px-3 py-1.5 text-xs font-mono text-white w-full">
+                                <button onclick="copyRoomCode()" class="p-2 bg-white text-black rounded-lg hover:bg-slate-200" title="Copy Code"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Host Controls</label>
+                            <button onclick="triggerPartySync('play')" class="w-full py-2 rounded-lg bg-white/10 border border-white/20 text-xs hover:bg-white/20 mb-2">Sync Play/Pause All</button>
+                            <button onclick="triggerPartySync('seek')" class="w-full py-2 rounded-lg bg-white/10 border border-white/20 text-xs hover:bg-white/20">Sync Current Time Stamp</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Shared Chatbox -->
+                    <div class="md:col-span-2 bg-black/60 border border-white/10 rounded-xl p-4 flex flex-col h-72">
+                        <div id="partyChatMessages" class="flex-1 overflow-y-auto space-y-2 text-xs pr-2">
+                            <div class="text-slate-500 italic">[System] Watch party room initialized. Share code REZ-8942 to invite friends.</div>
+                            <div class="text-emerald-400"><span class="font-bold">Alex (Host):</span> Welcome everyone! Ready to watch?</div>
+                        </div>
+                        <form onsubmit="sendPartyChatMessage(event)" class="mt-3 flex gap-2">
+                            <input type="text" id="partyChatInput" placeholder="Send message..." class="flex-1 bg-slate-900 border border-white/20 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-white">
+                            <button type="submit" class="px-4 py-1.5 bg-white text-black font-bold rounded-lg text-xs hover:bg-slate-200">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: CINE-HUB (SURPRISE FEATURES: MOOD ROULETTE, TRIVIA, BINGE CALCULATOR) -->
+        <section id="section-hub" class="hidden space-y-8">
+            <div class="border-b border-white/10 pb-4">
+                <h2 class="text-3xl font-black text-white tracking-tight flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-7 h-7 text-amber-300"></i> RezFlix Cine-Hub & Labs
+                </h2>
+                <p class="text-xs text-slate-400">Exclusive cinephile utility suite and mini-games.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- SURPRISE 1: Mood Roulette / Spin-the-Wheel -->
+                <div class="glass-card p-6 rounded-2xl space-y-4 border border-white/10">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 rounded-xl bg-amber-400/10 text-amber-300 border border-amber-400/20"><i data-lucide="dices" class="w-6 h-6"></i></div>
+                        <div>
+                            <h3 class="font-bold text-white text-base">Mood Roulette</h3>
+                            <p class="text-[11px] text-slate-400">Can't decide? Let fate choose.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <select id="moodSelect" class="w-full bg-slate-900 border border-white/20 text-xs text-white rounded-xl p-2.5">
+                            <option value="adrenaline">⚡ High Adrenaline / Action</option>
+                            <option value="mindbending">🧠 Mind-Bending Sci-Fi</option>
+                            <option value="cozy">🍵 Cozy / Feel-Good</option>
+                            <option value="dark">🌑 Dark Psychological Thriller</option>
+                        </select>
+                    </div>
+                    <button onclick="spinMoodRoulette()" class="w-full py-2.5 rounded-xl bg-white text-black font-bold text-xs shadow-neon-white hover:bg-slate-200">
+                        Spin Recommendations
+                    </button>
+                    <div id="rouletteResult" class="hidden p-3 rounded-xl bg-slate-900/80 border border-white/10 text-xs space-y-1"></div>
+                </div>
+
+                <!-- SURPRISE 2: Cinephile Movie Quiz & Trivia Battle -->
+                <div class="glass-card p-6 rounded-2xl space-y-4 border border-white/10">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 rounded-xl bg-indigo-400/10 text-indigo-300 border border-indigo-400/20"><i data-lucide="trophy" class="w-6 h-6"></i></div>
+                        <div>
+                            <h3 class="font-bold text-white text-base">Cinephile Trivia Battle</h3>
+                            <p class="text-[11px] text-slate-400">Earn RezFlix PRO Badges.</p>
+                        </div>
+                    </div>
+                    <div id="quizContainer" class="space-y-3">
+                        <p id="quizQuestion" class="text-xs text-slate-200 font-medium">Click start to answer quick cinema trivia!</p>
+                        <div id="quizOptions" class="space-y-1.5"></div>
+                    </div>
+                    <button id="quizActionBtn" onclick="startTriviaGame()" class="w-full py-2.5 rounded-xl bg-slate-900 border border-white/20 hover:border-white text-white font-bold text-xs">
+                        Start Trivia Game
+                    </button>
+                </div>
+
+                <!-- SURPRISE 3: Speed Binge Calculator -->
+                <div class="glass-card p-6 rounded-2xl space-y-4 border border-white/10">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 rounded-xl bg-emerald-400/10 text-emerald-300 border border-emerald-400/20"><i data-lucide="calculator" class="w-6 h-6"></i></div>
+                        <div>
+                            <h3 class="font-bold text-white text-base">Speed Binge Calculator</h3>
+                            <p class="text-[11px] text-slate-400">Calculate exact binge time.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <input type="number" id="bingeEpisodesInput" placeholder="Total Episodes (e.g. 24)" class="w-full bg-slate-900 border border-white/20 text-xs p-2.5 rounded-xl text-white">
+                        <input type="number" id="bingeLengthInput" placeholder="Avg Episode Mins (e.g. 45)" class="w-full bg-slate-900 border border-white/20 text-xs p-2.5 rounded-xl text-white">
+                    </div>
+                    <button onclick="calculateBingeTime()" class="w-full py-2.5 rounded-xl bg-white text-black font-bold text-xs shadow-neon-white hover:bg-slate-200">
+                        Calculate Finish Time
+                    </button>
+                    <div id="bingeResult" class="hidden p-3 rounded-xl bg-slate-900/80 border border-white/10 text-xs text-emerald-300 font-mono"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION: WATCHLIST -->
+        <section id="section-watchlist" class="hidden space-y-6">
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i data-lucide="bookmark" class="w-6 h-6"></i> My Watchlist</h2>
+            <div id="watchlistGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- Watchlist Items -->
+            </div>
+        </section>
+
+        <!-- SECTION: PROFILE & STATS -->
+        <section id="section-profile" class="hidden space-y-6">
+            <div class="glass-card p-8 rounded-2xl max-w-2xl mx-auto space-y-6 border border-white/20">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-white text-black text-2xl font-black flex items-center justify-center shadow-neon-white">
+                        U
+                    </div>
+                    <div>
+                        <h2 id="profileName" class="text-xl font-bold text-white">Cinephile User</h2>
+                        <p id="profileEmail" class="text-xs text-slate-400">user@rezflix.com</p>
+                        <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">PRO MEMBER</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 text-center border-y border-white/10 py-4">
+                    <div>
+                        <p class="text-xl font-bold text-white" id="statWatchlistCount">0</p>
+                        <p class="text-[10px] text-slate-400 uppercase">Saved Titles</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-bold text-white" id="statHoursWatched">42.5</p>
+                        <p class="text-[10px] text-slate-400 uppercase">Hours Watched</p>
+                    </div>
+                    <div>
+                        <p class="text-xl font-bold text-white" id="statReviewsCount">0</p>
+                        <p class="text-[10px] text-slate-400 uppercase">Notes Saved</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="exportUserData()" class="flex-1 py-2 bg-slate-900 border border-white/20 rounded-xl text-xs font-semibold hover:border-white flex items-center justify-center gap-1.5"><i data-lucide="download" class="w-4 h-4"></i> Export Backup</button>
+                    <label class="flex-1 py-2 bg-slate-900 border border-white/20 rounded-xl text-xs font-semibold hover:border-white flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Import Backup
+                        <input type="file" accept=".json" onchange="importUserData(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- AUTHENTICATION MODAL -->
+    <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-md p-6 rounded-2xl border border-white/20 space-y-6 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <div class="text-center space-y-1">
+                <h3 class="text-xl font-bold text-white">Welcome to RezFlix</h3>
+                <p class="text-xs text-slate-400">Sign in or create your cinephile account</p>
+            </div>
+            <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Email Address</label>
+                    <input type="email" id="authEmail" required placeholder="user@rezflix.com" class="w-full bg-slate-900 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-white">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Password</label>
+                    <input type="password" id="authPassword" required placeholder="••••••••" class="w-full bg-slate-900 border border-white/20 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-white">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-white text-black font-bold rounded-xl text-xs shadow-neon-white hover:bg-slate-200">
+                    Continue to RezFlix
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SOUNDSCAPE MODAL -->
+    <div id="soundscapeModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm p-6 rounded-2xl border border-white/20 space-y-4 relative">
+            <button onclick="toggleSoundscapeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <h3 class="text-base font-bold text-white flex items-center gap-2"><i data-lucide="headphones" class="w-4 h-4"></i> Cinematic Ambient Soundscape</h3>
+            <p class="text-xs text-slate-400">Synthesize ambient background noise while browsing.</p>
+            
+            <div class="space-y-2 pt-2">
+                <button onclick="toggleAudioSoundscape('rain')" id="audioBtn-rain" class="w-full p-3 rounded-xl bg-slate-900 border border-white/10 hover:border-white text-left text-xs font-semibold flex items-center justify-between">
+                    <span>🌧️ Cyberpunk Rain</span>
+                    <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="toggleAudioSoundscape('theater')" id="audioBtn-theater" class="w-full p-3 rounded-xl bg-slate-900 border border-white/10 hover:border-white text-left text-xs font-semibold flex items-center justify-between">
+                    <span>🍿 Cinema Room Hum</span>
+                    <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRAILER YOUTUBE MODAL -->
+    <div id="trailerModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4">
+        <div class="w-full max-w-4xl aspect-video bg-black rounded-2xl overflow-hidden relative border border-white/20">
+            <button onclick="closeTrailerModal()" class="absolute top-4 right-4 z-20 text-white bg-black/60 p-2 rounded-full hover:bg-white hover:text-black"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <iframe id="trailerIframe" class="w-full h-full border-0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        const TMDB_API_KEY = '99ecd77086a17d467e77eb5ca54d4c5a';
+        const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+        const TMDB_IMG_URL = 'https://image.tmdb.org/t/p/w500';
+        const TMDB_HD_IMG_URL = 'https://image.tmdb.org/t/p/original';
+
+        // Application State
+        let currentUser = JSON.parse(localStorage.getItem('rezflix_user')) || null;
+        let watchlist = JSON.parse(localStorage.getItem('rezflix_watchlist')) || [];
+        let currentMedia = null;
+        let currentSource = 'vidnest';
+        let selectedGenreId = '';
+        let activeSoundscape = null;
+        let soundscapeAudioCtx = null;
+
+        window.onload = function() {
+            lucide.createIcons();
+            updateAuthUI();
+            fetchGenreList();
+            fetchTop10Movies();
+            fetchTop10Series();
+            fetchTrendingAnime();
+            loadFeaturedHero();
+            setupKeyboardShortcuts();
+        };
+
+        function showSection(sectionId) {
+            const sections = ['home', 'player', 'watch-party', 'hub', 'watchlist', 'profile'];
+            sections.forEach(id => {
+                const el = document.getElementById(`section-${id}`);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(`section-${sectionId}`);
+            if (target) target.classList.remove('hidden');
+
+            if (sectionId === 'watchlist') renderWatchlist();
+            if (sectionId === 'profile') renderProfileStats();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function fetchTop10Movies() {
+            try {
+                const res = await fetch(`${TMDB_BASE_URL}/trending/movie/day?api_key=${TMDB_API_KEY}`);
+                const data = await res.json();
+                const top10 = data.results.slice(0, 10);
+                renderTop10Carousel(top10, 'top10MoviesContainer', 'movie');
+            } catch (err) {
+                console.error("Top 10 Movies Error:", err);
+            }
+        }
+
+        async function fetchTop10Series() {
+            try {
+                const res = await fetch(`${TMDB_BASE_URL}/trending/tv/day?api_key=${TMDB_API_KEY}`);
+                const data = await res.json();
+                const top10 = data.results.slice(0, 10);
+                renderTop10Carousel(top10, 'top10SeriesContainer', 'tv');
+            } catch (err) {
+                console.error("Top 10 Series Error:", err);
+            }
+        }
+
+        function renderTop10Carousel(items, containerId, mediaType) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = items.map((item, index) => {
+                const title = item.title || item.name;
+                const poster = item.poster_path ? `${TMDB_IMG_URL}${item.poster_path}` : 'https://placehold.co/300x450/121215/ffffff?text=No+Poster';
+                
+                return `
+                    <div onclick="openMediaDetails(${item.id}, '${mediaType}')" class="relative flex-shrink-0 w-44 md:w-52 cursor-pointer group snap-start">
+                        <!-- Number Badge Overlay -->
+                        <div class="absolute -left-3 bottom-0 top10-number z-20 pointer-events-none">
+                            ${index + 1}
+                        </div>
+                        <div class="relative rounded-xl overflow-hidden glass-card transition-all duration-300 group-hover:scale-105 group-hover:shadow-neon-white ml-6">
+                            <img src="${poster}" alt="${title}" class="w-full h-64 md:h-76 object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
+                            <div class="absolute bottom-2 left-2 right-2 p-2">
+                                <h4 class="text-xs font-bold text-white truncate">${title}</h4>
+                                <div class="flex items-center gap-1 text-[10px] text-emerald-400 mt-0.5">
+                                    <i data-lucide="star" class="w-3 h-3 fill-emerald-400"></i>
+                                    <span>${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        async function fetchTrendingAnime() {
+            const query = `
+                query {
+                    Page(page: 1, perPage: 6) {
+                        media(type: ANIME, sort: TRENDING_DESC) {
+                            id
+                            title { romaji english }
+                            coverImage { extraLarge }
+                            averageScore
+                            description
+                        }
+                    }
+                }
+            `;
+            try {
+                const res = await fetch('https://graphql.anilist.co', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                const data = await res.json();
+                const animeList = data.data.Page.media;
+                renderAnimeGrid(animeList);
+            } catch (err) {
+                console.error("AniList Fetch Error:", err);
+            }
+        }
+
+        function renderAnimeGrid(list) {
+            const grid = document.getElementById('trendingAnimeGrid');
+            if (!grid) return;
+
+            grid.innerHTML = list.map(anime => `
+                <div onclick="openAnimeDetails(${anime.id}, '${anime.title.english || anime.title.romaji}')" class="glass-card rounded-xl overflow-hidden cursor-pointer group hover:scale-105 transition-all">
+                    <img src="${anime.coverImage.extraLarge}" class="w-full h-56 object-cover">
+                    <div class="p-2.5">
+                        <h4 class="text-xs font-bold text-white truncate">${anime.title.english || anime.title.romaji}</h4>
+                        <span class="text-[10px] text-emerald-400 font-bold">AniList Score: ${anime.averageScore}%</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadFeaturedHero() {
+            try {
+                const res = await fetch(`${TMDB_BASE_URL}/trending/all/day?api_key=${TMDB_API_KEY}`);
+                const data = await res.json();
+                const hero = data.results[0];
+
+                if (hero) {
+                    const title = hero.title || hero.name;
+                    const mediaType = hero.media_type || 'movie';
+                    document.getElementById('heroTitle').innerText = title;
+                    document.getElementById('heroOverview').innerText = hero.overview;
+                    document.getElementById('heroBgImg').src = hero.backdrop_path ? `${TMDB_HD_IMG_URL}${hero.backdrop_path}` : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1600';
+                    document.getElementById('heroTypeBadge').innerText = mediaType.toUpperCase();
+                    
+                    document.getElementById('heroPlayBtn').onclick = () => openMediaDetails(hero.id, mediaType);
+                    document.getElementById('heroTrailerBtn').onclick = () => openTrailerModal(hero.id, mediaType);
+                    document.getElementById('heroAddWatchlistBtn').onclick = () => toggleWatchlist({ id: hero.id, title, mediaType, poster_path: hero.poster_path });
+                }
+            } catch (err) {
+                console.error("Hero Load Error:", err);
+            }
+        }
+
+        let searchTimeout;
+        function handleLiveSearch(query) {
+            clearTimeout(searchTimeout);
+            const dropdown = document.getElementById('searchResultsDropdown');
+            const clearBtn = document.getElementById('clearSearchBtn');
+
+            if (!query.trim()) {
+                dropdown.classList.add('hidden');
+                clearBtn.classList.add('hidden');
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`${TMDB_BASE_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
+                    const data = await res.json();
+                    renderSearchResults(data.results.slice(0, 5));
+                } catch (err) {
+                    console.error("Search error:", err);
+                }
+            }, 300);
+        }
+
+        function renderSearchResults(results) {
+            const list = document.getElementById('searchResultsList');
+            const dropdown = document.getElementById('searchResultsDropdown');
+
+            if (results.length === 0) {
+                list.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center">No titles found</div>`;
+            } else {
+                list.innerHTML = results.map(item => {
+                    const title = item.title || item.name;
+                    const poster = item.poster_path ? `${TMDB_IMG_URL}${item.poster_path}` : 'https://placehold.co/100x150/121215/ffffff?text=No+Img';
+                    const mediaType = item.media_type || 'movie';
+
+                    return `
+                        <div onclick="openMediaDetails(${item.id}, '${mediaType}'); clearSearch();" class="p-2.5 flex items-center gap-3 hover:bg-white/10 cursor-pointer transition-colors">
+                            <img src="${poster}" class="w-10 h-14 object-cover rounded-md">
+                            <div>
+                                <h5 class="text-xs font-bold text-white">${title}</h5>
+                                <span class="text-[10px] text-slate-400 uppercase">${mediaType} • ${item.release_date || item.first_air_date || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            dropdown.classList.remove('hidden');
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResultsDropdown').classList.add('hidden');
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+        }
+
+        async function openMediaDetails(id, mediaType) {
+            showSection('player');
+            try {
+                const res = await fetch(`${TMDB_BASE_URL}/${mediaType}/${id}?api_key=${TMDB_API_KEY}&append_to_response=credits`);
+                const data = await res.json();
+                
+                currentMedia = { id, mediaType, ...data };
+                
+                document.getElementById('playerMediaTitle').innerText = data.title || data.name;
+                document.getElementById('playerOverview').innerText = data.overview;
+                document.getElementById('playerReleaseDate').innerText = data.release_date || data.first_air_date || 'N/A';
+                document.getElementById('playerRating').innerHTML = `<i data-lucide="star" class="w-3 h-3 fill-emerald-400"></i> ${data.vote_average ? data.vote_average.toFixed(1) : 'N/A'}`;
+                document.getElementById('playerGenres').innerText = data.genres ? data.genres.map(g => g.name).join(', ') : '';
+
+                // Handle Season/Episode Selectors for TV
+                const epControls = document.getElementById('episodeControls');
+                if (mediaType === 'tv' && data.number_of_seasons) {
+                    epControls.classList.remove('hidden');
+                    setupSeasonSelector(data.number_of_seasons);
+                } else {
+                    epControls.classList.add('hidden');
+                }
+
+                // Render Cast
+                if (data.credits && data.credits.cast) {
+                    renderCastCarousel(data.credits.cast.slice(0, 8));
+                }
+
+                // Update Embed URL
+                updateEmbedPlayer();
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Error opening media details:", err);
+            }
+        }
+
+        function openAnimeDetails(animeId, title) {
+            showSection('player');
+            document.getElementById('playerMediaTitle').innerText = title;
+            document.getElementById('playerOverview').innerText = "Streaming anime content integrated via AniList & Multi-Source Embed engine.";
+            document.getElementById('episodeControls').classList.add('hidden');
+            
+            // VidLink/VidNest anime search stream fallback
+            const iframe = document.getElementById('mediaIframe');
+            iframe.src = `https://vidlink.pro/anime/${animeId}`;
+        }
+
+        function setupSeasonSelector(numSeasons) {
+            const seasonSelect = document.getElementById('seasonSelect');
+            seasonSelect.innerHTML = Array.from({length: numSeasons}, (_, i) => `<option value="${i+1}">Season ${i+1}</option>`).join('');
+            onSeasonChange();
+        }
+
+        function onSeasonChange() {
+            const epSelect = document.getElementById('episodeSelect');
+            epSelect.innerHTML = Array.from({length: 24}, (_, i) => `<option value="${i+1}">Ep ${i+1}</option>`).join('');
+            updateEmbedPlayer();
+        }
+
+        function onEpisodeChange() {
+            updateEmbedPlayer();
+        }
+
+        function changeStreamingSource(source) {
+            currentSource = source;
+            updateEmbedPlayer();
+        }
+
+        function updateEmbedPlayer() {
+            if (!currentMedia) return;
+            const iframe = document.getElementById('mediaIframe');
+            const { id, mediaType } = currentMedia;
+            
+            const season = document.getElementById('seasonSelect')?.value || 1;
+            const episode = document.getElementById('episodeSelect')?.value || 1;
+
+            let url = '';
+            if (mediaType === 'movie') {
+                if (currentSource === 'vidnest') url = `https://vidnest.fun/movie/${id}`;
+                else if (currentSource === 'vidsrc_to') url = `https://vidsrc.to/embed/movie/${id}`;
+                else if (currentSource === 'vidlink') url = `https://vidlink.pro/movie/${id}`;
+                else if (currentSource === 'vidsrc_icu') url = `https://vidsrc.icu/embed/movie/${id}`;
+                else if (currentSource === 'superembed') url = `https://multiembed.mov/?video_id=${id}&tmdb=1`;
+            } else {
+                if (currentSource === 'vidnest') url = `https://vidnest.fun/tv/${id}/${season}/${episode}`;
+                else if (currentSource === 'vidsrc_to') url = `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`;
+                else if (currentSource === 'vidlink') url = `https://vidlink.pro/tv/${id}/${season}/${episode}`;
+                else if (currentSource === 'vidsrc_icu') url = `https://vidsrc.icu/embed/tv/${id}/${season}/${episode}`;
+                else if (currentSource === 'superembed') url = `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`;
+            }
+
+            iframe.src = url;
+        }
+
+        function renderCastCarousel(cast) {
+            const container = document.getElementById('castCarousel');
+            container.innerHTML = cast.map(person => `
+                <div class="flex-shrink-0 w-24 text-center space-y-1">
+                    <img src="${person.profile_path ? TMDB_IMG_URL + person.profile_path : 'https://placehold.co/100x100/121215/ffffff?text=Actor'}" class="w-16 h-16 rounded-full object-cover mx-auto border border-white/20">
+                    <p class="text-xs font-bold text-white truncate">${person.name}</p>
+                    <p class="text-[10px] text-slate-400 truncate">${person.character}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleAmbientBacklight() {
+            const ambient = document.getElementById('ambientBacklight');
+            ambient.classList.toggle('opacity-0');
+            ambient.classList.toggle('opacity-100');
+        }
+
+        function startWatchPartyFromPlayer() {
+            showSection('watch-party');
+        }
+
+        function copyRoomCode() {
+            const codeInput = document.getElementById('partyRoomCode');
+            navigator.clipboard.writeText(codeInput.value);
+            alert('Room Code Copied to Clipboard!');
+        }
+
+        function sendPartyChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('partyChatInput');
+            const messages = document.getElementById('partyChatMessages');
+            if (!input.value.trim()) return;
+
+            const name = currentUser ? currentUser.email.split('@')[0] : 'Guest';
+            const msg = document.createElement('div');
+            msg.innerHTML = `<span class="font-bold text-white">${name}:</span> ${input.value}`;
+            messages.appendChild(msg);
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function triggerPartySync(action) {
+            const messages = document.getElementById('partyChatMessages');
+            const msg = document.createElement('div');
+            msg.className = 'text-amber-300 italic';
+            msg.innerText = `[Party Sync] Host triggered ${action.toUpperCase()} action across all room peers.`;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function spinMoodRoulette() {
+            const mood = document.getElementById('moodSelect').value;
+            let genreId = 28; // Action default
+            if (mood === 'mindbending') genreId = 878;
+            if (mood === 'cozy') genreId = 35;
+            if (mood === 'dark') genreId = 53;
+
+            try {
+                const res = await fetch(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=${genreId}`);
+                const data = await res.json();
+                const randomPick = data.results[Math.floor(Math.random() * data.results.length)];
+
+                const resBox = document.getElementById('rouletteResult');
+                resBox.innerHTML = `
+                    <p class="font-bold text-white">🎉 Mood Match Found:</p>
+                    <p class="text-white font-semibold">${randomPick.title}</p>
+                    <button onclick="openMediaDetails(${randomPick.id}, 'movie')" class="mt-2 text-[10px] px-3 py-1 bg-white text-black font-bold rounded-lg">Watch Pick</button>
+                `;
+                resBox.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        const triviaData = [
+            { q: "Which movie featured the iconic line 'I'll be back'?", options: ["The Terminator", "Predator", "Die Hard"], ans: 0 },
+            { q: "Who directed 'Inception' and 'Interstellar'?", options: ["Steven Spielberg", "Christopher Nolan", "Quentin Tarantino"], ans: 1 },
+            { q: "What year was the first Matrix movie released?", options: ["1997", "1999", "2001"], ans: 1 }
+        ];
+        let currentTriviaIdx = 0;
+
+        function startTriviaGame() {
+            const q = triviaData[currentTriviaIdx];
+            document.getElementById('quizQuestion').innerText = q.q;
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = q.options.map((opt, i) => `
+                <button onclick="checkTriviaAnswer(${i})" class="w-full text-left p-2 rounded-lg bg-slate-900 hover:bg-white/10 text-xs text-white border border-white/10">${opt}</button>
+            `).join('');
+            document.getElementById('quizActionBtn').classList.add('hidden');
+        }
+
+        function checkTriviaAnswer(selected) {
+            if (selected === triviaData[currentTriviaIdx].ans) {
+                alert("Correct! 🌟 +100 Cinephile Points");
+            } else {
+                alert("Incorrect! Better luck next time.");
+            }
+            currentTriviaIdx = (currentTriviaIdx + 1) % triviaData.length;
+            document.getElementById('quizActionBtn').innerText = "Next Question";
+            document.getElementById('quizActionBtn').classList.remove('hidden');
+        }
+
+        function calculateBingeTime() {
+            const eps = parseInt(document.getElementById('bingeEpisodesInput').value) || 0;
+            const len = parseInt(document.getElementById('bingeLengthInput').value) || 0;
+            const totalMins = eps * len;
+            const hours = (totalMins / 60).toFixed(1);
+
+            const res = document.getElementById('bingeResult');
+            res.innerText = `Total Binge Duration: ${hours} Hours (${totalMins} mins).`;
+            res.classList.remove('hidden');
+        }
+
+        function toggleAudioSoundscape(type) {
+            if (activeSoundscape === type) {
+                if (soundscapeAudioCtx) soundscapeAudioCtx.close();
+                activeSoundscape = null;
+                alert('Soundscape stopped');
+                return;
+            }
+
+            soundscapeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const bufferSize = soundscapeAudioCtx.sampleRate * 2;
+            const buffer = soundscapeAudioCtx.createBuffer(1, bufferSize, soundscapeAudioCtx.sampleRate);
+            const output = buffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+
+            const whiteNoise = soundscapeAudioCtx.createBufferSource();
+            whiteNoise.buffer = buffer;
+            whiteNoise.loop = true;
+
+            const filter = soundscapeAudioCtx.createBiquadFilter();
+            filter.type = type === 'rain' ? 'lowpass' : 'bandpass';
+            filter.frequency.value = type === 'rain' ? 800 : 400;
+
+            whiteNoise.connect(filter);
+            filter.connect(soundscapeAudioCtx.destination);
+            whiteNoise.start();
+
+            activeSoundscape = type;
+            alert(`Playing ${type.toUpperCase()} soundscape ambience.`);
+        }
+
+        function toggleSoundscapeModal() {
+            const modal = document.getElementById('soundscapeModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function toggleWatchlist(item) {
+            const idx = watchlist.findIndex(w => w.id === item.id);
+            if (idx > -1) {
+                watchlist.splice(idx, 1);
+                alert('Removed from Watchlist');
+            } else {
+                watchlist.push(item);
+                alert('Added to Watchlist');
+            }
+            localStorage.setItem('rezflix_watchlist', JSON.stringify(watchlist));
+            updateWatchlistBadge();
+        }
+
+        function updateWatchlistBadge() {
+            const badge = document.getElementById('watchlistCountBadge');
+            if (watchlist.length > 0) {
+                badge.innerText = watchlist.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderWatchlist() {
+            const grid = document.getElementById('watchlistGrid');
+            if (watchlist.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-xs text-slate-400">Your watchlist is currently empty.</p>`;
+                return;
+            }
+            grid.innerHTML = watchlist.map(item => `
+                <div onclick="openMediaDetails(${item.id}, '${item.mediaType}')" class="glass-card rounded-xl overflow-hidden cursor-pointer group hover:scale-105 transition-all">
+                    <img src="${TMDB_IMG_URL}${item.poster_path}" class="w-full h-56 object-cover">
+                    <div class="p-2.5">
+                        <h4 class="text-xs font-bold text-white truncate">${item.title}</h4>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            currentUser = { email, loggedInAt: new Date().toISOString() };
+            localStorage.setItem('rezflix_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAuthModal();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('rezflix_user');
+            updateAuthUI();
+            showSection('home');
+        }
+
+        function updateAuthUI() {
+            const loginBtn = document.getElementById('loginBtn');
+            const profileContainer = document.getElementById('userProfileBtnContainer');
+
+            if (currentUser) {
+                loginBtn.classList.add('hidden');
+                profileContainer.classList.remove('hidden');
+                const name = currentUser.email.split('@')[0];
+                document.getElementById('userNameDisplay').innerText = name;
+                document.getElementById('userAvatar').innerText = name.charAt(0).toUpperCase();
+                document.getElementById('dropdownUserEmail').innerText = currentUser.email;
+            } else {
+                loginBtn.classList.remove('hidden');
+                profileContainer.classList.add('hidden');
+            }
+            updateWatchlistBadge();
+        }
+
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        }
+
+        function renderProfileStats() {
+            if (!currentUser) return;
+            document.getElementById('profileName').innerText = currentUser.email.split('@')[0];
+            document.getElementById('profileEmail').innerText = currentUser.email;
+            document.getElementById('statWatchlistCount').innerText = watchlist.length;
+        }
+
+        function exportUserData() {
+            const data = { watchlist, currentUser, exportedAt: new Date() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'rezflix_backup.json';
+            a.click();
+        }
+
+        function importUserData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    if (parsed.watchlist) {
+                        watchlist = parsed.watchlist;
+                        localStorage.setItem('rezflix_watchlist', JSON.stringify(watchlist));
+                        renderWatchlist();
+                        alert('Watchlist successfully imported!');
+                    }
+                } catch (err) {
+                    alert('Invalid JSON File');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function openTrailerModal(id, mediaType) {
+            try {
+                const res = await fetch(`${TMDB_BASE_URL}/${mediaType}/${id}/videos?api_key=${TMDB_API_KEY}`);
+                const data = await res.json();
+                const trailer = data.results.find(v => v.type === 'Trailer') || data.results[0];
+
+                if (trailer) {
+                    document.getElementById('trailerIframe').src = `https://www.youtube.com/embed/${trailer.key}?autoplay=1`;
+                    document.getElementById('trailerModal').classList.remove('hidden');
+                } else {
+                    alert('No trailer available for this title.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function closeTrailerModal() {
+            document.getElementById('trailerIframe').src = '';
+            document.getElementById('trailerModal').classList.add('hidden');
+        }
+
+        async function fetchGenreList() {
+            try {
+                const res = await fetch(`${TMDB_BASE_URL}/genre/movie/list?api_key=${TMDB_API_KEY}`);
+                const data = await res.json();
+                const container = document.getElementById('genreChips');
+                container.innerHTML = data.genres.map(g => `
+                    <button onclick="selectGenre(${g.id}, this)" class="genre-chip shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 border border-white/10 hover:border-white transition-all text-slate-300">
+                        ${g.name}
+                    </button>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function selectGenre(genreId, btnEl) {
+            document.querySelectorAll('.genre-chip').forEach(b => b.classList.remove('bg-white', 'text-black'));
+            btnEl.classList.add('bg-white', 'text-black');
+            selectedGenreId = genreId;
+        }
+
+        function setupKeyboardShortcuts() {
+            window.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                
+                if (e.code === 'KeyF') {
+                    const iframe = document.getElementById('mediaIframe');
+                    if (iframe.requestFullscreen) iframe.requestFullscreen();
+                } else if (e.code === 'Escape') {
+                    closeTrailerModal();
+                    closeAuthModal();
+                    document.getElementById('soundscapeModal').classList.add('hidden');
+                }
+            });
+        }
+
+        function saveMediaNote() {
+            const note = document.getElementById('mediaNoteInput').value;
+            if (note.trim()) {
+                alert('Note saved to personal cinephile journal!');
+            }
+        }
+
+        function filterByMediaType(type) {
+            showSection('home');
+            if (type === 'movie') fetchTop10Movies();
+            else if (type === 'tv') fetchTop10Series();
+            else if (type === 'anime') fetchTrendingAnime();
+        }
+    </script>
+</body>
+</html>
