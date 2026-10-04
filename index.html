@@ -73,11 +73,11 @@
                 </nav>
             </div>
 
-            <!-- SEARCH ENGINE BAR WITH LIVE RESULTS OVERLAY -->
+            <!-- UNFILTERED SEARCH ENGINE BAR -->
             <div class="relative flex-1 max-w-md hidden sm:block">
                 <div class="relative flex items-center">
                     <i data-lucide="search" class="absolute left-4 w-4 h-4 text-zinc-400 pointer-events-none"></i>
-                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search movies, anime, TV shows..." 
+                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search any movie or TV show..." 
                            class="w-full bg-zinc-900/90 border border-white/15 rounded-full pl-11 pr-20 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all shadow-inner">
                     
                     <div class="absolute right-3 flex items-center gap-1">
@@ -88,7 +88,7 @@
                     </div>
                 </div>
 
-                <!-- LIVE SEARCH RESULTS PANEL CONTAINER -->
+                <!-- LIVE SEARCH OVERLAY -->
                 <div id="searchResultsPanel" class="hidden absolute top-full left-0 right-0 mt-3 bg-zinc-950/95 border border-white/20 rounded-2xl shadow-card-glow backdrop-blur-2xl overflow-hidden z-50 max-h-[440px] overflow-y-auto">
                     <div id="searchResultsList" class="divide-y divide-white/5"></div>
                 </div>
@@ -111,7 +111,7 @@
             </div>
         </div>
 
-        <!-- Mobile Navigation & Mobile Search Bar -->
+        <!-- Mobile Navigation -->
         <div id="mobileNav" class="hidden md:hidden px-4 pb-4 border-t border-white/10 space-y-3 bg-zinc-950">
             <div class="mt-3">
                 <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search catalog..." class="w-full bg-zinc-900 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white">
@@ -128,7 +128,7 @@
     <!-- MAIN APP LAYOUT -->
     <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 flex-1">
         
-        <!-- CINEMATIC FEATURED HERO BANNER -->
+        <!-- FEATURED HERO BANNER -->
         <section id="heroBanner" class="relative rounded-3xl overflow-hidden border border-white/15 bg-zinc-950 min-h-[420px] lg:min-h-[480px] flex items-end p-6 lg:p-12 shadow-card-glow group">
             <div id="heroBg" class="absolute inset-0 bg-cover bg-center scale-105 group-hover:scale-100 transition-transform duration-700 opacity-50"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
@@ -186,7 +186,7 @@
         <div class="flex items-center justify-center gap-2 font-black text-white text-sm tracking-wider">
             <span>REZFLIX</span>
         </div>
-        <p>© 2026 RezFlix Media Platform. Built for speed and simplicity.</p>
+        <p>© 2026 RezFlix Media Platform. Multi-Provider Fallback Active.</p>
     </footer>
 
     <!-- STREAM PLAYER MODAL -->
@@ -204,6 +204,7 @@
                         <option value="vidsrc">VidSrc.to</option>
                         <option value="vidlink">VidLink HD</option>
                         <option value="autoembed">AutoEmbed</option>
+                        <option value="superembed">SuperEmbed</option>
                     </select>
                     <button onclick="closeModal('playerModal')" class="p-2 text-zinc-400 hover:text-white rounded-xl hover:bg-white/10 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
@@ -269,21 +270,23 @@
     <!-- TOAST SYSTEM -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 hidden bg-zinc-900 border border-white/20 text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-card-glow flex items-center gap-2"></div>
 
-    <!-- APPLICATION LOGIC & MOCK FALLBACK DATA -->
     <script>
+        // API Configuration with backup parameters
         const TMDB_KEY = "99ecd77086a17d467e77eb5ca54d4c5a";
         const TMDB_URL = "https://api.themoviedb.org/3";
         const IMG = "https://image.tmdb.org/t/p/w500";
         const BACKDROP = "https://image.tmdb.org/t/p/original";
 
-        // LOCAL MOCK CATALOG (Guarantees immediate search and playback even without network/TMDB API connection)
+        // EXTENDED LOCAL CATALOG FALLBACK (Ensures popular show queries always work even if API is blocked)
         const MOCK_CATALOG = [
-            { id: 157336, title: "Interstellar", media_type: "movie", type: "movie", poster_path: "/gEU2A1hOA1793R3M8L2L4m3m8i.jpg", backdrop_path: "/xJH33M19B86i.jpg", overview: "The adventures of a group of explorers who make use of a newly discovered wormhole." },
+            { id: 157336, title: "Interstellar", media_type: "movie", type: "movie", poster_path: "/gEU2A1hOA1793R3M8L2L4m3m8i.jpg", overview: "The adventures of a group of explorers who make use of a newly discovered wormhole." },
             { id: 27205, title: "Inception", media_type: "movie", type: "movie", poster_path: "/oYuLEIr331P3B3v298.jpg", overview: "Cobb steals information from the targets' subconscious during dreams." },
             { id: 1396, name: "Breaking Bad", title: "Breaking Bad", media_type: "tv", type: "tv", poster_path: "/zt2123.jpg", overview: "A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing methamphetamine." },
             { id: 670292, title: "The Creator", media_type: "movie", type: "movie", poster_path: "/vBZ8621.jpg", overview: "Against a future war between the human race and artificial intelligence." },
             { id: 93405, name: "Squid Game", title: "Squid Game", media_type: "tv", type: "tv", poster_path: "/d332.jpg", overview: "Hundreds of cash-strapped players accept a strange invitation to compete in children's games." },
-            { id: 155, title: "The Dark Knight", media_type: "movie", type: "movie", poster_path: "/qJ2t.jpg", overview: "Batman raises the stakes in his war on crime." }
+            { id: 155, title: "The Dark Knight", media_type: "movie", type: "movie", poster_path: "/qJ2t.jpg", overview: "Batman raises the stakes in his war on crime." },
+            { id: 66732, name: "Stranger Things", title: "Stranger Things", media_type: "tv", type: "tv", poster_path: "/49W1L3A.jpg", overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments." },
+            { id: 82856, name: "The Mandalorian", title: "The Mandalorian", media_type: "tv", type: "tv", poster_path: "/sA123.jpg", overview: "The travels of a lone bounty hunter in the outer reaches of the galaxy." }
         ];
 
         let currentMedia = null;
@@ -295,19 +298,20 @@
             loadHome();
             checkUser();
 
-            // Keyboard shortcut for ESC to close search panel
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') clearSearch();
             });
         });
 
-        async function api(endpoint) {
+        // Robust API Handler with param injection
+        async function api(endpoint, params = "") {
             try {
-                const res = await fetch(`${TMDB_URL}${endpoint}?api_key=${TMDB_KEY}`);
-                if (!res.ok) throw new Error("TMDB Response Error");
+                const connector = endpoint.includes('?') ? '&' : '?';
+                const res = await fetch(`${TMDB_URL}${endpoint}${connector}api_key=${TMDB_KEY}&include_adult=true${params}`);
+                if (!res.ok) throw new Error("TMDB Error");
                 return await res.json();
             } catch (err) {
-                console.warn("Using Local Catalog Fallback:", err);
+                console.warn("TMDB request failed or blocked:", endpoint, err);
                 return null;
             }
         }
@@ -389,7 +393,7 @@
             }).join('');
         }
 
-        /* GUARANTEED SEARCH ENGINE ENGINE LOGIC */
+        /* DUAL-QUERY UNFILTERED SEARCH ENGINE */
         let searchTimeout = null;
         async function handleSearch(q) {
             const panel = document.getElementById('searchResultsPanel');
@@ -406,17 +410,32 @@
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(async () => {
                 let results = [];
-                const data = await api(`/search/multi?query=${encodeURIComponent(q)}`);
                 
-                if (data && data.results && data.results.length > 0) {
-                    results = data.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
-                } else {
-                    // Fallback to searching local mock database if API fails or returns no match
-                    results = MOCK_CATALOG.filter(i => i.title.toLowerCase().includes(q.toLowerCase()));
+                // Primary Multi Search
+                const multiData = await api(`/search/multi`, `&query=${encodeURIComponent(q)}`);
+                if (multiData && multiData.results && multiData.results.length > 0) {
+                    results = multiData.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
+                }
+
+                // Fallback to specific Movie & TV searches if multi yields nothing or few results
+                if (results.length === 0) {
+                    const [movieData, tvData] = await Promise.all([
+                        api(`/search/movie`, `&query=${encodeURIComponent(q)}`),
+                        api(`/search/tv`, `&query=${encodeURIComponent(q)}`)
+                    ]);
+                    
+                    const movies = (movieData?.results || []).map(i => ({ ...i, media_type: 'movie' }));
+                    const tvs = (tvData?.results || []).map(i => ({ ...i, media_type: 'tv' }));
+                    results = [...movies, ...tvs];
+                }
+
+                // Final Fallback: Local mock database matcher
+                if (results.length === 0) {
+                    results = MOCK_CATALOG.filter(i => (i.title || i.name).toLowerCase().includes(q.toLowerCase()));
                 }
 
                 if (results.length > 0) {
-                    list.innerHTML = results.slice(0, 8).map(item => {
+                    list.innerHTML = results.slice(0, 10).map(item => {
                         const title = item.title || item.name || 'Untitled';
                         const type = (item.title || item.media_type === 'movie') ? 'movie' : 'tv';
                         const date = item.release_date || item.first_air_date || '';
@@ -501,7 +520,7 @@
             const tvBar = document.getElementById('tvBar');
             if (type === 'tv') {
                 tvBar.classList.remove('hidden');
-                document.getElementById('seasonSelect').innerHTML = Array.from({length: 10}, (_, i) => `<option value="${i+1}">Season ${i+1}</option>`).join('');
+                document.getElementById('seasonSelect').innerHTML = Array.from({length: 12}, (_, i) => `<option value="${i+1}">Season ${i+1}</option>`).join('');
                 updateEpisodes();
             } else {
                 tvBar.classList.add('hidden');
@@ -512,7 +531,7 @@
         }
 
         function updateEpisodes() {
-            document.getElementById('episodeSelect').innerHTML = Array.from({length: 24}, (_, i) => `<option value="${i+1}">Episode ${i+1}</option>`).join('');
+            document.getElementById('episodeSelect').innerHTML = Array.from({length: 30}, (_, i) => `<option value="${i+1}">Episode ${i+1}</option>`).join('');
             updatePlayerIframe();
         }
 
@@ -532,6 +551,8 @@
                 url = type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${season}/${episode}`;
             } else if (currentServer === 'autoembed') {
                 url = type === 'movie' ? `https://player.autoembed.cc/embed/movie/${id}` : `https://player.autoembed.cc/embed/tv/${id}/${season}/${episode}`;
+            } else if (currentServer === 'superembed') {
+                url = type === 'movie' ? `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1` : `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${season}&e=${episode}`;
             }
             iframe.src = url;
         }
