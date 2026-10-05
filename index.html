@@ -37,7 +37,7 @@
         ::-webkit-scrollbar-thumb { background: #22222a; border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: #444455; }
         .glass-header {
-            background: rgba(8, 8, 10, 0.75);
+            background: rgba(8, 8, 10, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
@@ -51,6 +51,13 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-white selection:text-black">
+
+    <!-- TOP NAMES BANNER -->
+    <div class="bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 border-b border-white/10 py-2 px-4 text-center">
+        <p class="text-xs sm:text-sm font-bold tracking-wide text-zinc-200">
+            zaman imran, esha imran, amaima imran, imran, shazia, ibrahim
+        </p>
+    </div>
 
     <!-- TOP NAVIGATION BAR -->
     <header class="sticky top-0 z-50 w-full glass-header border-b border-white/10 transition-all">
@@ -67,9 +74,6 @@
                     <button id="tab-home" onclick="switchTab('home')" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-black">Home</button>
                     <button id="tab-movies" onclick="switchTab('movies')" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-white/10">Movies</button>
                     <button id="tab-tv" onclick="switchTab('tv')" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-white/10">TV Shows</button>
-                    <button id="tab-anime" onclick="switchTab('anime')" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-white/10 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-indigo-400"></span> Anime
-                    </button>
                     <button id="tab-watchlist" onclick="switchTab('watchlist')" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-zinc-400 hover:text-white hover:bg-white/10 flex items-center gap-1.5">
                         <i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Watchlist
                     </button>
@@ -80,7 +84,7 @@
             <div class="relative flex-1 max-w-md hidden sm:block">
                 <div class="relative flex items-center">
                     <i data-lucide="search" class="absolute left-4 w-4 h-4 text-zinc-400 pointer-events-none"></i>
-                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search Movies, Shows, or Anime..." 
+                    <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search Movies or TV Shows..." 
                            class="w-full bg-zinc-900/90 border border-white/15 rounded-full pl-11 pr-20 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30 transition-all shadow-inner">
                     
                     <div class="absolute right-3 flex items-center gap-1">
@@ -92,7 +96,7 @@
                 </div>
 
                 <!-- LIVE SEARCH OVERLAY -->
-                <div id="searchResultsPanel" class="hidden absolute top-full left-0 right-0 mt-3 bg-zinc-950/95 border border-white/20 rounded-2xl shadow-card-glow backdrop-blur-2xl overflow-hidden z-50 max-h-[440px] overflow-y-auto">
+                <div id="searchResultsPanel" class="hidden absolute top-full left-0 right-0 mt-3 bg-zinc-950 border border-white/20 rounded-2xl shadow-card-glow backdrop-blur-2xl overflow-hidden z-50 max-h-[440px] overflow-y-auto">
                     <div id="searchResultsList" class="divide-y divide-white/5"></div>
                 </div>
             </div>
@@ -117,13 +121,12 @@
         <!-- Mobile Navigation -->
         <div id="mobileNav" class="hidden md:hidden px-4 pb-4 border-t border-white/10 space-y-3 bg-zinc-950">
             <div class="mt-3">
-                <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search movies or anime..." class="w-full bg-zinc-900 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white">
+                <input type="text" id="mobileSearchInput" oninput="handleSearch(this.value)" placeholder="Search movies or TV shows..." class="w-full bg-zinc-900 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white">
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="switchTab('home'); toggleMobileNav();" class="px-3 py-2 text-left text-xs font-semibold text-zinc-300 hover:bg-white/10 rounded-lg">Home</button>
                 <button onclick="switchTab('movies'); toggleMobileNav();" class="px-3 py-2 text-left text-xs font-semibold text-zinc-300 hover:bg-white/10 rounded-lg">Movies</button>
                 <button onclick="switchTab('tv'); toggleMobileNav();" class="px-3 py-2 text-left text-xs font-semibold text-zinc-300 hover:bg-white/10 rounded-lg">TV Shows</button>
-                <button onclick="switchTab('anime'); toggleMobileNav();" class="px-3 py-2 text-left text-xs font-semibold text-zinc-300 hover:bg-white/10 rounded-lg">Anime</button>
                 <button onclick="switchTab('watchlist'); toggleMobileNav();" class="px-3 py-2 text-left text-xs font-semibold text-zinc-300 hover:bg-white/10 rounded-lg">Watchlist</button>
             </div>
         </div>
@@ -169,7 +172,7 @@
         <section id="top10TVSection" class="space-y-5">
             <div class="flex items-center gap-3">
                 <div class="w-1.5 h-6 bg-white rounded-full"></div>
-                <h2 class="text-xl font-extrabold text-white tracking-wide">Top 10 TV & Anime Series</h2>
+                <h2 class="text-xl font-extrabold text-white tracking-wide">Top 10 TV Series Today</h2>
             </div>
             <div id="top10TVGrid" class="flex gap-4 overflow-x-auto no-scrollbar py-2"></div>
         </section>
@@ -190,7 +193,7 @@
         <div class="flex items-center justify-center gap-2 font-black text-white text-sm tracking-wider">
             <span>REZFLIX</span>
         </div>
-        <p>© 2026 RezFlix Media Platform. TMDB + AniList API Synchronized.</p>
+        <p>© 2026 RezFlix Media Platform.</p>
     </footer>
 
     <!-- STREAM PLAYER MODAL -->
@@ -208,7 +211,6 @@
                         <option value="vidsrc">VidSrc.to</option>
                         <option value="vidlink">VidLink HD</option>
                         <option value="autoembed">AutoEmbed</option>
-                        <option value="anime_embed">Anime Player (AniList)</option>
                     </select>
                     <button onclick="closeModal('playerModal')" class="p-2 text-zinc-400 hover:text-white rounded-xl hover:bg-white/10 transition-all"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
@@ -279,13 +281,11 @@
     <script>
         const TMDB_KEY = "99ecd77086a17d467e77eb5ca54d4c5a";
         const TMDB_URL = "https://api.themoviedb.org/3";
-        const ANILIST_URL = "https://graphql.anilist.co";
         const IMG = "https://image.tmdb.org/t/p/w500";
         const BACKDROP = "https://image.tmdb.org/t/p/original";
 
         let currentMedia = null;
         let currentTvData = null;
-        let currentAnimeData = null;
         let currentServer = 'vidnest';
         let watchlist = JSON.parse(localStorage.getItem('rezflix_watchlist')) || [];
 
@@ -312,22 +312,6 @@
             }
         }
 
-        // ANILIST GRAPHQL API CONNECTOR
-        async function fetchAniList(query, variables = {}) {
-            try {
-                const res = await fetch(ANILIST_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ query, variables })
-                });
-                const data = await res.json();
-                return data?.data;
-            } catch (err) {
-                console.warn("AniList query error:", err);
-                return null;
-            }
-        }
-
         async function loadHome() {
             document.getElementById('gridTitle').innerText = "Trending Catalog";
             document.getElementById('top10Section').classList.remove('hidden');
@@ -347,13 +331,13 @@
         }
 
         function setupHero(item) {
-            const title = item.title || item.name || item.titleRomaji;
-            const bg = item.backdrop_path ? (item.backdrop_path.startsWith('/') ? BACKDROP + item.backdrop_path : item.backdrop_path) : (item.bannerImage || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200');
+            const title = item.title || item.name || 'Featured Title';
+            const bg = item.backdrop_path ? BACKDROP + item.backdrop_path : (item.poster_path ? IMG + item.poster_path : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1200');
             document.getElementById('heroBg').style.backgroundImage = `url('${bg}')`;
             document.getElementById('heroTitle').innerText = title;
-            document.getElementById('heroOverview').innerText = item.overview || item.description || "Stream this title instantly on RezFlix.";
-            const type = item.isAnime ? 'anime' : (item.title ? 'movie' : 'tv');
-            document.getElementById('heroPlayBtn').onclick = () => openPlayer(item.id, type, title, item.anilistId);
+            document.getElementById('heroOverview').innerText = item.overview || "Stream this title instantly on RezFlix.";
+            const type = item.title || item.media_type === 'movie' ? 'movie' : 'tv';
+            document.getElementById('heroPlayBtn').onclick = () => openPlayer(item.id, type, title);
             document.getElementById('heroWatchlistBtn').onclick = () => toggleWatchlist(item);
         }
 
@@ -361,7 +345,7 @@
             const container = document.getElementById(containerId);
             container.innerHTML = items.map((item, idx) => {
                 const title = item.title || item.name || 'Untitled';
-                const poster = item.poster_path ? (item.poster_path.startsWith('/') ? IMG + item.poster_path : item.poster_path) : 'https://via.placeholder.com/300x450/121217/ffffff?text=' + encodeURIComponent(title);
+                const poster = item.poster_path ? IMG + item.poster_path : 'https://via.placeholder.com/300x450/121217/ffffff?text=' + encodeURIComponent(title);
                 return `
                     <div onclick="openPlayer(${item.id}, '${type}', '${title.replace(/'/g, "\\'")}')" class="relative flex-shrink-0 w-36 sm:w-44 cursor-pointer group">
                         <div class="aspect-[2/3] rounded-2xl overflow-hidden border border-white/10 relative glass-card group-hover:border-white transition-all shadow-lg">
@@ -384,27 +368,26 @@
             const container = document.getElementById(containerId);
             document.getElementById('gridCount').innerText = `Showing ${items.length} titles`;
             container.innerHTML = items.map(item => {
-                const title = item.title || item.name || item.titleRomaji || item.titleEnglish || 'Untitled';
-                const type = item.isAnime ? 'anime' : ((item.title || item.media_type === 'movie') ? 'movie' : 'tv');
-                const poster = item.coverImage || (item.poster_path ? (item.poster_path.startsWith('/') ? IMG + item.poster_path : item.poster_path) : 'https://via.placeholder.com/300x450/121217/ffffff?text=' + encodeURIComponent(title));
-                const extraParam = item.anilistId ? item.anilistId : '';
+                const title = item.title || item.name || 'Untitled';
+                const type = (item.title || item.media_type === 'movie') ? 'movie' : 'tv';
+                const poster = item.poster_path ? IMG + item.poster_path : 'https://via.placeholder.com/300x450/121217/ffffff?text=' + encodeURIComponent(title);
 
                 return `
-                    <div onclick="openPlayer(${item.id}, '${type}', '${title.replace(/'/g, "\\'")}', '${extraParam}')" class="glass-card rounded-2xl overflow-hidden cursor-pointer border border-white/10 hover:border-white hover:scale-[1.02] transition-all group shadow-lg">
+                    <div onclick="openPlayer(${item.id}, '${type}', '${title.replace(/'/g, "\\'")}')" class="glass-card rounded-2xl overflow-hidden cursor-pointer border border-white/10 hover:border-white hover:scale-[1.02] transition-all group shadow-lg">
                         <div class="aspect-[2/3] overflow-hidden relative">
                             <img src="${poster}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/300x450/121217/ffffff?text=Media'">
                             <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[9px] font-black uppercase tracking-wider text-zinc-300 border border-white/10">${type}</span>
                         </div>
                         <div class="p-3 space-y-1">
                             <h4 class="text-xs font-extrabold text-white truncate group-hover:text-white transition-colors">${title}</h4>
-                            <p class="text-[10px] font-medium text-zinc-500 capitalize">${type === 'anime' ? 'Anime Series' : (type === 'movie' ? 'Feature Film' : 'TV Series')}</p>
+                            <p class="text-[10px] font-medium text-zinc-500 capitalize">${type === 'movie' ? 'Feature Film' : 'TV Series'}</p>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        /* HYBRID SEARCH: TMDB + ANILIST DUAL ENGINE */
+        /* DIRECT TMDB LIVE SEARCH ENGINE */
         let searchTimeout = null;
         async function handleSearch(q) {
             const panel = document.getElementById('searchResultsPanel');
@@ -420,62 +403,23 @@
 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(async () => {
-                let results = [];
+                const searchRes = await api('/search/multi', `&query=${encodeURIComponent(q)}`);
                 
-                // 1. Fetch AniList Search concurrently
-                const aniQuery = `
-                    query ($search: String) {
-                        Page(perPage: 6) {
-                            media(search: $search, type: ANIME) {
-                                id
-                                title { romaji english native }
-                                coverImage { large }
-                                bannerImage
-                                episodes
-                                status
-                                description
-                            }
-                        }
-                    }
-                `;
-
-                const [tmdbMulti, aniRes] = await Promise.all([
-                    api(`/search/multi`, `&query=${encodeURIComponent(q)}`),
-                    fetchAniList(aniQuery, { search: q })
-                ]);
-
-                if (tmdbMulti && tmdbMulti.results) {
-                    results = tmdbMulti.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
-                }
-
-                if (aniRes && aniRes.Page && aniRes.Page.media) {
-                    const animeList = aniRes.Page.media.map(a => ({
-                        id: a.id,
-                        anilistId: a.id,
-                        title: a.title.english || a.title.romaji,
-                        titleRomaji: a.title.romaji,
-                        poster_path: a.coverImage?.large,
-                        coverImage: a.coverImage?.large,
-                        backdrop_path: a.bannerImage,
-                        episodes: a.episodes,
-                        overview: a.description ? a.description.replace(/<[^>]*>/g, '') : '',
-                        isAnime: true,
-                        media_type: 'anime'
-                    }));
-                    results = [...animeList, ...results];
+                let results = [];
+                if (searchRes && searchRes.results) {
+                    results = searchRes.results.filter(i => i.media_type === 'movie' || i.media_type === 'tv');
                 }
 
                 if (results.length > 0) {
                     list.innerHTML = results.slice(0, 10).map(item => {
-                        const title = item.title || item.name || item.titleRomaji || 'Untitled';
-                        const type = item.isAnime ? 'anime' : ((item.title || item.media_type === 'movie') ? 'movie' : 'tv');
+                        const title = item.title || item.name || 'Untitled';
+                        const type = (item.title || item.media_type === 'movie') ? 'movie' : 'tv';
                         const date = item.release_date || item.first_air_date || '';
-                        const year = date ? `(${date.split('-')[0]})` : (item.episodes ? `(${item.episodes} Ep)` : '');
-                        const poster = item.coverImage || (item.poster_path ? (item.poster_path.startsWith('/') ? IMG + item.poster_path : item.poster_path) : 'https://via.placeholder.com/100x150/121217/ffffff?text=Poster');
-                        const extraParam = item.anilistId ? item.anilistId : '';
+                        const year = date ? `(${date.split('-')[0]})` : '';
+                        const poster = item.poster_path ? IMG + item.poster_path : 'https://via.placeholder.com/100x150/121217/ffffff?text=Poster';
 
                         return `
-                            <div onclick="openPlayer(${item.id}, '${type}', '${title.replace(/'/g, "\\'")}', '${extraParam}'); clearSearch();" class="flex items-center gap-3.5 p-3 hover:bg-white/10 cursor-pointer transition-colors group">
+                            <div onclick="openPlayer(${item.id}, '${type}', '${title.replace(/'/g, "\\'")}'); clearSearch();" class="flex items-center gap-3.5 p-3 hover:bg-white/10 cursor-pointer transition-colors group">
                                 <img src="${poster}" class="w-10 h-14 object-cover rounded-xl border border-white/10 flex-shrink-0" onerror="this.src='https://via.placeholder.com/100x150/121217/ffffff?text=IMG'">
                                 <div class="min-w-0 flex-1">
                                     <h5 class="text-xs font-extrabold text-white truncate group-hover:text-white">${title} <span class="text-zinc-500 font-normal">${year}</span></h5>
@@ -496,7 +440,7 @@
                     list.innerHTML = `<div class="p-6 text-xs text-zinc-400 text-center font-semibold">No results found for "${q}".</div>`;
                     panel.classList.remove('hidden');
                 }
-            }, 150);
+            }, 200);
         }
 
         function clearSearch() {
@@ -532,39 +476,6 @@
                 document.getElementById('gridTitle').innerText = "Popular TV Shows";
                 const data = await api('/discover/tv');
                 renderGrid(data?.results || [], 'mainGrid');
-            } else if (tab === 'anime') {
-                document.getElementById('top10Section').classList.add('hidden');
-                document.getElementById('top10TVSection').classList.add('hidden');
-                document.getElementById('gridTitle').innerText = "Popular Anime";
-                
-                const query = `
-                    query {
-                        Page(perPage: 20) {
-                            media(type: ANIME, sort: POPULARITY_DESC) {
-                                id
-                                title { romaji english }
-                                coverImage { large }
-                                bannerImage
-                                episodes
-                                description
-                            }
-                        }
-                    }
-                `;
-                const data = await fetchAniList(query);
-                if (data && data.Page && data.Page.media) {
-                    const items = data.Page.media.map(a => ({
-                        id: a.id,
-                        anilistId: a.id,
-                        title: a.title.english || a.title.romaji,
-                        coverImage: a.coverImage.large,
-                        bannerImage: a.bannerImage,
-                        episodes: a.episodes,
-                        overview: a.description ? a.description.replace(/<[^>]*>/g, '') : '',
-                        isAnime: true
-                    }));
-                    renderGrid(items, 'mainGrid');
-                }
             } else if (tab === 'watchlist') {
                 document.getElementById('top10Section').classList.add('hidden');
                 document.getElementById('top10TVSection').classList.add('hidden');
@@ -577,57 +488,23 @@
             }
         }
 
-        /* ANILIST INTEGRATED PLAYER & SEASON / EPISODE SYNC */
-        async function openPlayer(id, type, title, extraId = '') {
-            currentMedia = { id, type, title, extraId };
+        /* PLAYER & SEASON / EPISODE CONTROLS */
+        async function openPlayer(id, type, title) {
+            currentMedia = { id, type, title };
             currentTvData = null;
-            currentAnimeData = null;
             document.getElementById('playerTitle').innerText = title;
-            document.getElementById('playerSubtitle').innerText = `Playing ${type.toUpperCase()} • ID: ${id}`;
+            document.getElementById('playerSubtitle').innerText = `Playing ${type.toUpperCase()} • TMDB ID: ${id}`;
 
             const tvBar = document.getElementById('tvBar');
             const seasonContainer = document.getElementById('seasonContainer');
-            
-            if (type === 'anime') {
-                tvBar.classList.remove('hidden');
-                seasonContainer.classList.add('hidden'); // Anime typically uses single episode sequence or separate seasons per entry
-                document.getElementById('epCountBadge').innerText = "Querying AniList API...";
-                openModal('playerModal');
 
-                // Query AniList for exact total episodes & metadata
-                const animeQuery = `
-                    query ($id: Int) {
-                        Media(id: $id, type: ANIME) {
-                            id
-                            episodes
-                            nextAiringEpisode { episode }
-                            status
-                            title { romaji english }
-                        }
-                    }
-                `;
-                const aniRes = await fetchAniList(animeQuery, { id: parseInt(id) });
-                
-                if (aniRes && aniRes.Media) {
-                    currentAnimeData = aniRes.Media;
-                    // Total episodes = aired episodes or total
-                    const epTotal = aniRes.Media.episodes || (aniRes.Media.nextAiringEpisode ? aniRes.Media.nextAiringEpisode.episode - 1 : 24);
-                    populateEpisodeDropdown(epTotal);
-                    document.getElementById('epCountBadge').innerText = `AniList: ${epTotal} Episodes (${aniRes.Media.status})`;
-                } else {
-                    populateEpisodeDropdown(24);
-                    document.getElementById('epCountBadge').innerText = `24 Episodes`;
-                }
-                updatePlayerIframe();
-
-            } else if (type === 'tv') {
+            if (type === 'tv') {
                 tvBar.classList.remove('hidden');
                 seasonContainer.classList.remove('hidden');
                 document.getElementById('seasonSelect').innerHTML = `<option>Loading...</option>`;
                 document.getElementById('epCountBadge').innerText = "Fetching series data...";
                 openModal('playerModal');
 
-                // Fetch TV metadata from TMDB or check if it's an anime listed under TMDB
                 const tvData = await api(`/tv/${id}`);
                 
                 if (tvData && tvData.seasons && tvData.seasons.length > 0) {
@@ -682,36 +559,25 @@
 
         function updatePlayerIframe() {
             if (!currentMedia) return;
-            const { id, type, extraId } = currentMedia;
+            const { id, type } = currentMedia;
             const season = document.getElementById('seasonSelect')?.value || 1;
             const episode = document.getElementById('episodeSelect')?.value || 1;
             const iframe = document.getElementById('videoIframe');
 
             let url = "";
 
-            if (type === 'anime') {
-                if (currentServer === 'anime_embed') {
-                    url = `https://2embed.cc/embed/anime/${id}/${episode}`;
-                } else if (currentServer === 'vidsrc') {
-                    url = `https://vidsrc.to/embed/anime/${id}/${episode}`;
-                } else if (currentServer === 'vidlink') {
-                    url = `https://vidlink.pro/anime/${id}/${episode}`;
-                } else {
-                    url = `https://vidnest.fun/anime/${id}/${episode}`;
-                }
+            if (currentServer === 'vidnest') {
+                url = type === 'movie' ? `https://vidnest.fun/movie/${id}` : `https://vidnest.fun/tv/${id}/${season}/${episode}`;
+            } else if (currentServer === 'vidsrc') {
+                url = type === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`;
+            } else if (currentServer === 'vidlink') {
+                url = type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${season}/${episode}`;
+            } else if (currentServer === 'autoembed') {
+                url = type === 'movie' ? `https://player.autoembed.cc/embed/movie/${id}` : `https://player.autoembed.cc/embed/tv/${id}/${season}/${episode}`;
             } else {
-                if (currentServer === 'vidnest') {
-                    url = type === 'movie' ? `https://vidnest.fun/movie/${id}` : `https://vidnest.fun/tv/${id}/${season}/${episode}`;
-                } else if (currentServer === 'vidsrc') {
-                    url = type === 'movie' ? `https://vidsrc.to/embed/movie/${id}` : `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`;
-                } else if (currentServer === 'vidlink') {
-                    url = type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${season}/${episode}`;
-                } else if (currentServer === 'autoembed') {
-                    url = type === 'movie' ? `https://player.autoembed.cc/embed/movie/${id}` : `https://player.autoembed.cc/embed/tv/${id}/${season}/${episode}`;
-                } else {
-                    url = type === 'movie' ? `https://vidnest.fun/movie/${id}` : `https://vidnest.fun/tv/${id}/${season}/${episode}`;
-                }
+                url = type === 'movie' ? `https://vidnest.fun/movie/${id}` : `https://vidnest.fun/tv/${id}/${season}/${episode}`;
             }
+
             iframe.src = url;
         }
 
