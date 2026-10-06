@@ -196,7 +196,7 @@
           <div class="flex items-center gap-2">
             <span class="text-gray-400 font-semibold">Active Server:</span>
             <select id="server-select" onchange="switchServer(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded px-2 py-1 focus:outline-none">
-              <option value="vidsrc_pro">VidSrc Pro (Ultra Fast)</option>
+              <option value="vidsrc_pro">VidSrc Pro (Fast)</option>
               <option value="vidsrc_cc">VidSrc CC (High Quality)</option>
               <option value="autoembed">AutoEmbed Engine</option>
               <option value="vidnest">VidNest Primary</option>
@@ -286,7 +286,8 @@
 
     const fallbackMovies = [
       { id: 27205, title: "Inception", vote_average: 8.8, release_date: "2010-07-16", poster_path: "/oYuLE1311oA8hA1fcS2S2A25qT.jpg", backdrop_path: "/s3TBrRGB11M1yA3L336C6q2.jpg", overview: "A thief who steals corporate secrets through dream-sharing technology..." },
-      { id: 157336, title: "Interstellar", vote_average: 8.6, release_date: "2014-11-05", poster_path: "/gEU2A2ThP2qC21A33965IalO3i7.jpg", backdrop_path: "/xJHokMbljvjADYdit5f6S3L36C6.jpg", overview: "When Earth becomes uninhabitable, a team of explorers travels through a wormhole..." }
+      { id: 157336, title: "Interstellar", vote_average: 8.6, release_date: "2014-11-05", poster_path: "/gEU2A2ThP2qC21A33965IalO3i7.jpg", backdrop_path: "/xJHokMbljvjADYdit5f6S3L36C6.jpg", overview: "When Earth becomes uninhabitable, a team of explorers travels through a wormhole..." },
+      { id: 550, title: "Fight Club", vote_average: 8.4, release_date: "1999-10-15", poster_path: "/pB8O23122P32O83011S2a2.jpg", backdrop_path: "/hZk238910sS280.jpg", overview: "An ticking-clock worker forms an underground club..." }
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -306,7 +307,7 @@
     async function safeFetch(url) {
       try {
         const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
         return await res.json();
       } catch (err) {
         return null;
@@ -345,8 +346,6 @@
       list.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = "min-w-[180px] w-[180px] sm:min-w-[210px] sm:w-[210px] relative group cursor-pointer flex-shrink-0";
-        
-        // FIXED CLICK OVERLAYS & POINTER EVENTS
         card.onclick = () => openPlayer({...item, media_type: type});
 
         card.innerHTML = `
@@ -418,7 +417,6 @@
       return card;
     }
 
-    // FIXED PLAYBACK URL RESOLVER
     function getEmbedUrl(id, type, season = 1, episode = 1) {
       if (currentServer === 'vidsrc_pro') {
         if (type === 'movie') return `https://vidsrc.pro/embed/movie/${id}`;
@@ -507,7 +505,7 @@
         currentEpisode = data.episodes[0].episode_number;
         document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, 'tv', seasonNum, currentEpisode);
       } else {
-        list.innerHTML = `<p class="text-xs text-gray-500 p-2">No episode data available for this season.</p>`;
+        list.innerHTML = `<p class="text-xs text-gray-500 p-2">No episode details loaded.</p>`;
       }
       lucide.createIcons();
     }
