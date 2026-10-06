@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RezFlix - Ultimate Streaming & Sports Hub</title>
+  <title>RezFlix - Ultimate Streaming, Sports & Music Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -38,12 +38,11 @@
         height: 100% !important;
       }
     }
-    .glow-red {
-      box-shadow: 0 0 35px rgba(239, 68, 68, 0.35);
-    }
+    .glow-red { box-shadow: 0 0 35px rgba(239, 68, 68, 0.35); }
+    .glow-green { box-shadow: 0 0 35px rgba(34, 197, 94, 0.35); }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between hide-scrollbar">
+<body class="min-h-screen flex flex-col justify-between hide-scrollbar pb-24">
 
   <!-- Floating Navigation Header -->
   <header class="fixed top-0 left-0 w-full z-40 px-4 lg:px-12 py-4 flex items-center justify-between pointer-events-none">
@@ -56,20 +55,23 @@
 
     <!-- Center Navigation Pill Dock -->
     <nav class="fixed left-1/2 -translate-x-1/2 top-4 hidden md:flex items-center gap-1.5 glass-dock p-1.5 rounded-full z-50 pointer-events-auto">
-      <button id="nav-all" onclick="filterContent('all')" class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold bg-white/10 text-white transition-all shadow-sm">
+      <button id="nav-all" onclick="filterContent('all')" class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-white/10 text-white transition-all shadow-sm">
         <i data-lucide="home" class="w-3.5 h-3.5"></i> Home
       </button>
-      <button id="nav-movie" onclick="filterContent('movie')" class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
+      <button id="nav-movie" onclick="filterContent('movie')" class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
         <i data-lucide="clapperboard" class="w-3.5 h-3.5"></i> Movies
       </button>
-      <button id="nav-tv" onclick="filterContent('tv')" class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
+      <button id="nav-tv" onclick="filterContent('tv')" class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
         <i data-lucide="tv" class="w-3.5 h-3.5"></i> Series
       </button>
-      <button id="nav-anime" onclick="filterContent('anime')" class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
+      <button id="nav-anime" onclick="filterContent('anime')" class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
         <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Anime
       </button>
-      <button id="nav-sports" onclick="filterContent('sports')" class="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
+      <button id="nav-sports" onclick="filterContent('sports')" class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
         <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-400"></i> Sports
+      </button>
+      <button id="nav-music" onclick="filterContent('music')" class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">
+        <i data-lucide="music" class="w-3.5 h-3.5 text-emerald-400"></i> Music
       </button>
     </nav>
 
@@ -84,10 +86,10 @@
   </header>
 
   <!-- Main Content Area -->
-  <main id="app-content" class="flex-1 pb-20">
+  <main id="app-content" class="flex-1 pb-16">
     
     <!-- Hero Banner -->
-    <section class="relative w-full h-[70vh] md:h-[80vh] min-h-[500px] max-h-[850px] flex items-end">
+    <section id="hero-section" class="relative w-full h-[70vh] md:h-[80vh] min-h-[500px] max-h-[850px] flex items-end">
       <div id="hero-bg" class="absolute inset-0 z-0 bg-cover bg-center transition-all duration-1000 scale-105">
         <div class="absolute inset-0 bg-gradient-to-t from-[#06070a] via-[#06070a]/60 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-[#06070a] via-[#06070a]/40 to-transparent"></div>
@@ -101,9 +103,7 @@
           <span id="hero-year" class="text-gray-300 bg-white/10 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10">2026</span>
           <span class="text-red-400 uppercase tracking-widest font-extrabold">FEATURED PREMIERE</span>
         </div>
-        <h1 id="hero-title" class="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase mb-4 drop-shadow-2xl">
-          LANTERNS
-        </h1>
+        <h1 id="hero-title" class="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase mb-4 drop-shadow-2xl">LANTERNS</h1>
         <p id="hero-desc" class="text-gray-300 text-sm sm:text-base line-clamp-3 mb-8 max-w-2xl leading-relaxed font-medium">
           Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.
         </p>
@@ -171,7 +171,89 @@
       </div>
       <div id="sports-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </section>
+
+    <!-- Spotify-Like Music Section -->
+    <section id="section-music" class="px-6 lg:px-16 py-10" style="display:none;">
+      <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-extrabold text-emerald-400 tracking-widest uppercase">R E Z M U S I C</span>
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Unlimited Audio Streaming</h2>
+        </div>
+        <!-- Playlist Filter Tabs -->
+        <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
+          <button onclick="loadMusicPlaylist('Global Top Hits', 'pop')" class="px-4 py-2 rounded-xl bg-emerald-500 text-black font-extrabold text-xs whitespace-nowrap transition-all shadow-md">🔥 Top Hits</button>
+          <button onclick="loadMusicPlaylist('Chill Lofi Beats', 'lofi')" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs whitespace-nowrap transition-all">🎧 Chill Lofi</button>
+          <button onclick="loadMusicPlaylist('Gym Workout Energy', 'workout gym')" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs whitespace-nowrap transition-all">⚡ Workout</button>
+          <button onclick="loadMusicPlaylist('Rock & Indie Classics', 'rock indie')" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs whitespace-nowrap transition-all">🎸 Rock & Indie</button>
+          <button onclick="loadMusicPlaylist('Hip Hop & Rap', 'hip hop rap')" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs whitespace-nowrap transition-all">🎤 Hip Hop</button>
+        </div>
+      </div>
+
+      <!-- Music Search Bar -->
+      <div class="relative mb-8 max-w-xl">
+        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+        <input 
+          type="text" 
+          id="music-search-input"
+          onkeydown="if(event.key==='Enter') searchMusic(this.value)"
+          placeholder="Search millions of songs, artists, or albums..." 
+          class="w-full glass-card text-xs text-white pl-11 pr-4 py-3.5 rounded-2xl focus:outline-none focus:border-emerald-500 border border-white/15"
+        />
+      </div>
+
+      <!-- Current Playlist Header Banner -->
+      <div class="glass-card p-6 rounded-3xl border border-white/10 mb-8 flex items-center gap-6 bg-gradient-to-r from-emerald-950/40 via-emerald-900/10 to-transparent">
+        <div id="playlist-art" class="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-emerald-600/30 border border-emerald-500/40 flex items-center justify-center shrink-0 shadow-2xl">
+          <i data-lucide="disc" class="w-12 h-12 text-emerald-400 animate-spin" style="animation-duration: 8s;"></i>
+        </div>
+        <div>
+          <span class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest">CURATED PLAYLIST</span>
+          <h3 id="playlist-title" class="text-xl sm:text-3xl font-black text-white mt-1 mb-2">Global Top Hits</h3>
+          <p id="playlist-desc" class="text-xs text-gray-300 font-medium max-w-xl">Stream trending global anthems and chart-topping masterpieces instantly with background play support.</p>
+        </div>
+      </div>
+
+      <!-- Songs Grid -->
+      <div id="music-songs-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5"></div>
+    </section>
   </main>
+
+  <!-- Sticky Spotify-Style Music Player Bar (Bottom) -->
+  <div id="music-player-bar" class="fixed bottom-0 left-0 w-full z-40 glass-dock border-t border-white/10 px-6 py-3.5 flex items-center justify-between gap-4 shadow-2xl" style="display:none;">
+    <!-- Track Info -->
+    <div class="flex items-center gap-3.5 min-w-0 w-1/4">
+      <img id="bar-art" src="https://via.placeholder.com/60" class="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0 shadow-md" />
+      <div class="min-w-0">
+        <h4 id="bar-title" class="text-xs font-extrabold text-white truncate">Select a song</h4>
+        <p id="bar-artist" class="text-[10px] text-gray-400 font-bold truncate">RezMusic Audio</p>
+      </div>
+    </div>
+
+    <!-- Playback Controls & Seekbar -->
+    <div class="flex flex-col items-center gap-1.5 flex-1 max-w-xl">
+      <div class="flex items-center gap-5">
+        <button onclick="prevTrack()" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="skip-back" class="w-4 h-4 fill-current"></i></button>
+        <button onclick="togglePlayMusic()" id="bar-play-btn" class="w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black flex items-center justify-center transition-transform hover:scale-105 shadow-lg">
+          <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+        </button>
+        <button onclick="nextTrack()" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="skip-forward" class="w-4 h-4 fill-current"></i></button>
+      </div>
+      <div class="w-full flex items-center gap-2 text-[10px] text-gray-400 font-semibold">
+        <span id="current-time">0:00</span>
+        <input type="range" id="audio-seek" value="0" max="100" oninput="seekAudio(this.value)" class="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
+        <span id="total-duration">0:30</span>
+      </div>
+    </div>
+
+    <!-- Volume & Background Indicator -->
+    <div class="hidden md:flex items-center gap-3 w-1/4 justify-end text-xs text-emerald-400 font-bold">
+      <span class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg">
+        <i data-lucide="radio" class="w-3.5 h-3.5 animate-pulse"></i> Background Ready
+      </span>
+      <i data-lucide="volume-2" class="w-4 h-4 text-gray-400"></i>
+      <input type="range" min="0" max="1" step="0.05" value="1" oninput="audioElement.volume = this.value" class="w-20 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
+    </div>
+  </div>
 
   <!-- Video Streaming Modal -->
   <div id="player-modal" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-xl flex flex-col">
@@ -187,11 +269,11 @@
 
     <div class="flex-1 flex flex-col md:flex-row overflow-hidden player-container">
       <div class="flex-1 bg-black flex flex-col min-w-0 h-full">
-        <div class="relative w-full flex-1 bg-black">
+        <div class="relative w-full flex-1 bg-black aspect-video md:aspect-auto">
           <iframe id="video-iframe" class="absolute inset-0 w-full h-full border-0" allowfullscreen></iframe>
         </div>
         
-        <!-- Multi-Server Selector (12 Servers including 3 Anime servers) -->
+        <!-- Multi-Server Selector -->
         <div class="p-3 bg-gray-950 border-t border-white/10 flex items-center gap-2 overflow-x-auto text-xs font-bold hide-scrollbar shrink-0">
           <span class="text-gray-400 whitespace-nowrap px-1">Servers:</span>
           <button id="server-vidnest" onclick="changeProvider('vidnest')" class="px-3.5 py-2 rounded-xl bg-red-600 text-white whitespace-nowrap transition-all shadow-lg shadow-red-600/30">VidNest</button>
@@ -199,18 +281,11 @@
           <button id="server-vidlink" onclick="changeProvider('vidlink')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">VidLink</button>
           <button id="server-embedsu" onclick="changeProvider('embedsu')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">Embed.su</button>
           <button id="server-vidsrc" onclick="changeProvider('vidsrc')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">VidSrc</button>
-          <button id="server-autoembed" onclick="changeProvider('autoembed')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">AutoEmbed</button>
-          <button id="server-multiembed" onclick="changeProvider('multiembed')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">MultiEmbed</button>
-          <button id="server-twembed" onclick="changeProvider('twembed')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">2Embed</button>
-          <button id="server-smashy" onclick="changeProvider('smashy')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">SmashyStream</button>
-          <button id="server-gogo" onclick="changeProvider('gogo')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">GogoEmbed</button>
-          <button id="server-animepahe" onclick="changeProvider('animepahe')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">AnimePahe</button>
-          <button id="server-aniwave" onclick="changeProvider('aniwave')" class="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all">AniWave</button>
         </div>
       </div>
 
-      <!-- TV / Anime Episodes Sidebar -->
-      <div id="episodes-sidebar" class="episodes-sidebar-custom w-full md:w-72 lg:w-80 bg-[#090b10] border-t md:border-t-0 md:border-l border-white/10 p-4 overflow-y-auto hidden flex-col shrink-0">
+      <!-- TV / Anime Episodes Sidebar (Fixed so it doesn't cover screen) -->
+      <div id="episodes-sidebar" class="episodes-sidebar-custom w-full md:w-80 bg-[#090b10] border-t md:border-t-0 md:border-l border-white/10 p-4 overflow-y-auto hidden flex-col shrink-0 max-h-[45vh] md:max-h-none">
         <h4 class="text-xs sm:text-sm font-black text-white mb-3 flex items-center gap-2 shrink-0">
           <i data-lucide="list-video" class="w-4 h-4 text-red-500"></i> Seasons & Episodes
         </h4>
@@ -269,7 +344,7 @@
       <div class="flex items-start gap-2">
         <div class="w-7 h-7 rounded-lg bg-red-600/30 border border-red-500/40 flex items-center justify-center text-red-400 font-bold shrink-0">AI</div>
         <div class="bg-white/5 border border-white/10 p-3 rounded-2xl text-gray-200 leading-relaxed">
-          Hey there! I'm RezAI. Ask me for personalized movie recommendations, anime marathons, or sports highlights!
+          Hey there! I'm RezAI. Ask me for movie recommendations, anime marathons, or music playlists!
         </div>
       </div>
     </div>
@@ -299,6 +374,12 @@
     let activeSeason = 1;
     let activeEpisode = 1;
 
+    // Music Player state & Audio Engine
+    let audioElement = new Audio();
+    let currentPlaylistTracks = [];
+    let currentTrackIndex = 0;
+    let isPlaying = false;
+
     const fallbackMovies = [
       { id: 27205, title: "Inception", vote_average: 8.8, release_date: "2010-07-16", poster_path: "/oYuLE1311oA8hA1fcS2S2A25qT.jpg", backdrop_path: "/s3TBrRGB11M1yA3L336C6q2.jpg", overview: "A thief who steals corporate secrets through dream-sharing technology..." },
       { id: 157336, title: "Interstellar", vote_average: 8.6, release_date: "2014-11-05", poster_path: "/gEU2A2ThP2qC21A33965IalO3i7.jpg", backdrop_path: "/xJHokMbljvjADYdit5f6S3L36C6.jpg", overview: "When Earth becomes uninhabitable, a team of explorers travels through a wormhole..." }
@@ -311,6 +392,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       initApp();
+      initAudioListeners();
     });
 
     async function initApp() {
@@ -319,7 +401,8 @@
       await fetchTrendingMovies();
       await fetchTrendingSeries();
       await fetchAnimeMAL();
-      await fetchSportsData();
+      fetchSportsData();
+      loadMusicPlaylist('Global Top Hits', 'pop');
     }
 
     async function safeFetch(url) {
@@ -416,12 +499,11 @@
       }
     }
 
-    async function fetchSportsData() {
-      const data = await safeFetch('https://www.thesportsdb.com/api/v1/json/123/eventshighlights.php?d=2026-06-06');
+    function fetchSportsData() {
       const container = document.getElementById('sports-grid');
       container.innerHTML = '';
 
-      const events = (data && data.events) ? data.events : [
+      const events = [
         { strEvent: "Real Madrid vs Barcelona", strLeague: "La Liga El Clasico", dateEvent: "2026-06-06", strThumb: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500" },
         { strEvent: "Manchester City vs Arsenal", strLeague: "Premier League Showdown", dateEvent: "2026-06-06", strThumb: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500" },
         { strEvent: "Lakers vs Celtics", strLeague: "NBA Finals Game 4", dateEvent: "2026-06-06", strThumb: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500" },
@@ -434,20 +516,188 @@
         card.innerHTML = `
           <div>
             <div class="aspect-video rounded-xl overflow-hidden mb-3 relative bg-black/50">
-              <img src="${ev.strThumb || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500'" />
+              <img src="${ev.strThumb}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div class="absolute top-2 left-2 bg-amber-500 text-black text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider">LIVE</div>
             </div>
-            <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest">${ev.strLeague || 'Global Sports'}</span>
+            <span class="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest">${ev.strLeague}</span>
             <h3 class="text-sm font-black text-white mt-1 mb-2">${ev.strEvent}</h3>
           </div>
           <div class="flex items-center justify-between pt-3 border-t border-white/10 text-xs">
-            <span class="text-gray-400 font-semibold">${ev.dateEvent || 'Today'}</span>
-            <button onclick="alert('Streaming highlights for ${ev.strEvent}')" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 font-bold hover:bg-amber-500 hover:text-black transition-all">Watch Highlights</button>
+            <span class="text-gray-400 font-semibold">${ev.dateEvent}</span>
+            <button onclick="alert('Streaming live highlights for ${ev.strEvent}')" class="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 font-bold hover:bg-amber-500 hover:text-black transition-all">Watch Highlights</button>
           </div>
         `;
         container.appendChild(card);
       });
     }
+
+    // --- Spotify-Like Music Hub Implementation ---
+    async function loadMusicPlaylist(playlistName, query) {
+      document.getElementById('playlist-title').innerText = playlistName;
+      document.getElementById('playlist-desc').innerText = `Curated streaming hits for ${playlistName}.`;
+      
+      const data = await safeFetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=18`);
+      const container = document.getElementById('music-songs-grid');
+      container.innerHTML = '';
+
+      if (data && data.results) {
+        currentPlaylistTracks = data.results.filter(track => track.previewUrl);
+        currentPlaylistTracks.forEach((track, index) => {
+          const card = document.createElement('div');
+          card.className = "glass-card p-3.5 rounded-2xl border border-white/10 group hover:border-emerald-500/50 transition-all cursor-pointer flex flex-col justify-between shadow-xl";
+          card.onclick = () => playTrack(index);
+
+          const artwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100bb', '400x400bb') : 'https://via.placeholder.com/300';
+
+          card.innerHTML = `
+            <div>
+              <div class="relative aspect-square rounded-xl overflow-hidden mb-3 bg-gray-900 shadow-md">
+                <img src="${artwork}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div class="w-10 h-10 rounded-full bg-emerald-500 text-black flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                    <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+                  </div>
+                </div>
+              </div>
+              <h4 class="text-xs font-black text-white truncate group-hover:text-emerald-400 transition-colors">${track.trackName}</h4>
+              <p class="text-[10px] text-gray-400 font-bold truncate mt-0.5">${track.artistName}</p>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+        lucide.createIcons();
+      }
+    }
+
+    async function searchMusic(query) {
+      if (!query.trim()) return;
+      document.getElementById('playlist-title').innerText = `Search Results: "${query}"`;
+      document.getElementById('playlist-desc').innerText = `Matching tracks found across global audio databases.`;
+      
+      const data = await safeFetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=18`);
+      const container = document.getElementById('music-songs-grid');
+      container.innerHTML = '';
+
+      if (data && data.results) {
+        currentPlaylistTracks = data.results.filter(track => track.previewUrl);
+        currentPlaylistTracks.forEach((track, index) => {
+          const card = document.createElement('div');
+          card.className = "glass-card p-3.5 rounded-2xl border border-white/10 group hover:border-emerald-500/50 transition-all cursor-pointer flex flex-col justify-between shadow-xl";
+          card.onclick = () => playTrack(index);
+
+          const artwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100bb', '400x400bb') : 'https://via.placeholder.com/300';
+
+          card.innerHTML = `
+            <div>
+              <div class="relative aspect-square rounded-xl overflow-hidden mb-3 bg-gray-900 shadow-md">
+                <img src="${artwork}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div class="w-10 h-10 rounded-full bg-emerald-500 text-black flex items-center justify-center shadow-lg">
+                    <i data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
+                  </div>
+                </div>
+              </div>
+              <h4 class="text-xs font-black text-white truncate group-hover:text-emerald-400 transition-colors">${track.trackName}</h4>
+              <p class="text-[10px] text-gray-400 font-bold truncate mt-0.5">${track.artistName}</p>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+        lucide.createIcons();
+      }
+    }
+
+    function playTrack(index) {
+      if (!currentPlaylistTracks[index]) return;
+      currentTrackIndex = index;
+      const track = currentPlaylistTracks[index];
+
+      audioElement.src = track.previewUrl;
+      audioElement.play().then(() => {
+        isPlaying = true;
+        updatePlayerBarUI(track);
+      }).catch(err => console.error("Audio playback error:", err));
+    }
+
+    function updatePlayerBarUI(track) {
+      document.getElementById('music-player-bar').style.display = 'flex';
+      document.getElementById('bar-title').innerText = track.trackName;
+      document.getElementById('bar-artist').innerText = track.artistName;
+      const art = track.artworkUrl100 ? track.artworkUrl100.replace('100x100bb', '200x200bb') : '';
+      document.getElementById('bar-art').src = art;
+      
+      const playBtn = document.getElementById('bar-play-btn');
+      playBtn.innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
+      lucide.createIcons();
+
+      // Configure Media Session API for Background Play & Lock Screen Controls (works outside Safari/website)
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: track.trackName,
+          artist: track.artistName,
+          album: track.collectionName || 'RezMusic Collection',
+          artwork: [{ src: art, sizes: '200x200', type: 'image/jpeg' }]
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => { audioElement.play(); isPlaying = true; });
+        navigator.mediaSession.setActionHandler('pause', () => { audioElement.pause(); isPlaying = false; });
+        navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+        navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+      }
+    }
+
+    function togglePlayMusic() {
+      if (!audioElement.src) return;
+      const playBtn = document.getElementById('bar-play-btn');
+      if (isPlaying) {
+        audioElement.pause();
+        isPlaying = false;
+        playBtn.innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>`;
+      } else {
+        audioElement.play();
+        isPlaying = true;
+        playBtn.innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i>`;
+      }
+      lucide.createIcons();
+    }
+
+    function nextTrack() {
+      if (currentPlaylistTracks.length === 0) return;
+      currentTrackIndex = (currentTrackIndex + 1) % currentPlaylistTracks.length;
+      playTrack(currentTrackIndex);
+    }
+
+    function prevTrack() {
+      if (currentPlaylistTracks.length === 0) return;
+      currentTrackIndex = (currentTrackIndex - 1 + currentPlaylistTracks.length) % currentPlaylistTracks.length;
+      playTrack(currentTrackIndex);
+    }
+
+    function seekAudio(val) {
+      if (audioElement.duration) {
+        audioElement.currentTime = (val / 100) * audioElement.duration;
+      }
+    }
+
+    function initAudioListeners() {
+      audioElement.addEventListener('timeupdate', () => {
+        if (audioElement.duration) {
+          const progress = (audioElement.currentTime / audioElement.duration) * 100;
+          document.getElementById('audio-seek').value = progress;
+          document.getElementById('current-time').innerText = formatTime(audioElement.currentTime);
+          document.getElementById('total-duration').innerText = formatTime(audioElement.duration);
+        }
+      });
+      audioElement.addEventListener('ended', () => nextTrack());
+    }
+
+    function formatTime(secs) {
+      const mins = Math.floor(secs / 60);
+      const remainingSecs = Math.floor(secs % 60);
+      return `${mins}:${remainingSecs < 10 ? '0' : ''}${remainingSecs}`;
+    }
+
+    // --- End Music Hub ---
 
     function createCard(item, type) {
       const card = document.createElement('div');
@@ -464,15 +714,17 @@
     }
 
     function filterContent(type) {
-      document.querySelectorAll('nav button').forEach(btn => btn.className = "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all");
+      document.querySelectorAll('nav button').forEach(btn => btn.className = "flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all");
       const activeBtn = document.getElementById(`nav-${type}`);
-      if (activeBtn) activeBtn.className = "flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold bg-white/10 text-white transition-all shadow-sm";
+      if (activeBtn) activeBtn.className = "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-white/10 text-white transition-all shadow-sm";
 
+      document.getElementById('hero-section').style.display = (type === 'all') ? 'flex' : 'none';
       document.getElementById('section-top10').style.display = (type === 'all' || type === 'movie' || type === 'tv') ? 'block' : 'none';
       document.getElementById('section-movies').style.display = (type === 'all' || type === 'movie') ? 'block' : 'none';
       document.getElementById('section-series').style.display = (type === 'all' || type === 'tv') ? 'block' : 'none';
       document.getElementById('section-anime').style.display = (type === 'all' || type === 'anime') ? 'block' : 'none';
       document.getElementById('section-sports').style.display = (type === 'sports') ? 'block' : 'none';
+      document.getElementById('section-music').style.display = (type === 'music') ? 'block' : 'none';
     }
 
     function openPlayer(item) {
@@ -519,24 +771,6 @@
       } else if (currentProvider === 'embedsu') {
         if (type === 'movie') return `https://embed.su/embed/movie/${id}`;
         return `https://embed.su/embed/tv/${id}/${season}/${episode}`;
-      } else if (currentProvider === 'autoembed') {
-        if (type === 'movie') return `https://player.autoembed.cc/embed/movie/${id}`;
-        return `https://player.autoembed.cc/embed/tv/${id}/${season}/${episode}`;
-      } else if (currentProvider === 'multiembed') {
-        if (type === 'movie') return `https://multiembed.mov/?video_id=${id}&tmdb=1`;
-        return `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`;
-      } else if (currentProvider === 'twembed') {
-        if (type === 'movie') return `https://2embed.cc/embed/${id}`;
-        return `https://2embed.cc/embedtv/${id}&s=${season}&e=${episode}`;
-      } else if (currentProvider === 'smashy') {
-        if (type === 'movie') return `https://player.smashy.stream/movie/${id}`;
-        return `https://player.smashy.stream/tv/${id}?s=${season}&e=${episode}`;
-      } else if (currentProvider === 'gogo') {
-        return `https://vidnest.fun/animepahe/${id}/${episode}/sub`;
-      } else if (currentProvider === 'animepahe') {
-        return `https://vidnest.fun/anime/${id}/${episode}/sub`;
-      } else if (currentProvider === 'aniwave') {
-        return `https://anikoto.com/embed/${id}/${episode}`;
       } else {
         if (type === 'movie') return `https://vidsrc.xyz/embed/movie/${id}`;
         return `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`;
@@ -551,7 +785,7 @@
 
     function changeProvider(provider) {
       currentProvider = provider;
-      ['vidnest', 'anikoto', 'vidlink', 'embedsu', 'vidsrc', 'autoembed', 'multiembed', 'twembed', 'smashy', 'gogo', 'animepahe', 'aniwave'].forEach(p => {
+      ['vidnest', 'anikoto', 'vidlink', 'embedsu', 'vidsrc'].forEach(p => {
         const btn = document.getElementById(`server-${p}`);
         if (btn) btn.className = p === provider ? "px-3.5 py-2 rounded-xl bg-red-600 text-white whitespace-nowrap transition-all shadow-lg shadow-red-600/30 font-bold" : "px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap hover:bg-white/10 transition-all";
       });
@@ -647,8 +881,7 @@
     function closeSearchModal() { document.getElementById('search-modal').classList.add('hidden'); }
 
     function toggleAiModal() {
-      const modal = document.getElementById('ai-modal');
-      modal.classList.toggle('hidden');
+      document.getElementById('ai-modal').classList.toggle('hidden');
     }
 
     function openAiWithContext() {
@@ -668,7 +901,6 @@
       appendAiMessage("User", text);
       input.value = '';
 
-      // Add loading state bubble
       const loadingId = appendAiMessage("AI", "RezAI is thinking...", true);
 
       try {
@@ -685,7 +917,7 @@
       const container = document.getElementById('ai-chat-messages');
       const isUser = sender === "User";
       const div = document.createElement('div');
-      const msgId = 'msg-' + Math.random().toString(36.substr(2, 9));
+      const msgId = 'msg-' + Math.random().toString(36).substr(2, 9);
       div.id = msgId;
       div.className = `flex items-start gap-2 ${isUser ? 'flex-row-reverse' : ''}`;
       
@@ -710,7 +942,7 @@
       
       const payload = {
         system_instruction: {
-          parts: [{ text: "You are RezAI, an expert, enthusiastic AI streaming and sports assistant on the RezFlix platform. Help users discover the best movies, TV series, anime masterpieces, and live sports highlights. Keep your answers engaging, well-formatted, and concise." }]
+          parts: [{ text: "You are RezAI, an expert, enthusiastic AI streaming, music, and sports assistant on the RezFlix platform. Help users discover the best movies, TV series, anime, sports highlights, and music playlists. Keep your answers engaging, well-formatted, and concise." }]
         },
         contents: [
           {
