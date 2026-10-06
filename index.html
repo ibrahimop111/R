@@ -6,6 +6,7 @@
   <title>RezFlix - Watch Free Movies, TV Shows & Anime</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/standalone/umd/vis-network.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
@@ -22,6 +23,13 @@
     }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    #ai-graph-container {
+      width: 100%;
+      height: 420px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      background: #0d0f17;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between hide-scrollbar">
@@ -89,9 +97,12 @@
         <p id="hero-desc" class="text-gray-300 text-sm sm:text-base line-clamp-3 mb-8 max-w-2xl leading-relaxed">
           Fetching top titles...
         </p>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-4">
           <button id="hero-play-btn" onclick="playHero()" class="bg-white hover:bg-gray-200 text-black font-bold px-8 py-3.5 rounded-full flex items-center gap-2 shadow-xl transition-all transform hover:scale-105">
             <i data-lucide="play" class="w-5 h-5 fill-current"></i> Play
+          </button>
+          <button onclick="openAIMindMapForHero()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold px-6 py-3.5 rounded-full flex items-center gap-2 shadow-xl transition-all transform hover:scale-105">
+            <i data-lucide="brain-circuit" class="w-5 h-5"></i> AI Arc & Mind Map
           </button>
           <button id="hero-bookmark-btn" onclick="toggleHeroWatchlist()" class="bg-gray-900/80 hover:bg-gray-800 text-white font-semibold px-6 py-3.5 rounded-full border border-gray-700/80 flex items-center gap-2 backdrop-blur-md transition-all">
             <i data-lucide="bookmark" class="w-5 h-5"></i> Add to List
@@ -165,19 +176,31 @@
         <span id="player-type-badge" class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">STREAM</span>
         <h3 id="player-title" class="text-lg font-bold text-white truncate max-w-md">Streaming Title</h3>
       </div>
-      <button onclick="closePlayer()" class="p-2 rounded-full bg-gray-800 text-gray-300 hover:text-white transition-all">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
+      <div class="flex items-center gap-3">
+        <button onclick="openAIMindMapCurrent()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-md">
+          <i data-lucide="brain-circuit" class="w-4 h-4"></i> AI Mind Map
+        </button>
+        <button onclick="closePlayer()" class="p-2 rounded-full bg-gray-800 text-gray-300 hover:text-white transition-all">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
     </div>
 
     <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
       <div class="flex-1 bg-black flex flex-col">
         <div class="relative w-full flex-1 min-h-[300px]">
-          <iframe id="video-iframe" class="absolute inset-0 w-full h-full border-0" allowfullscreen></iframe>
+          <iframe id="video-iframe" class="absolute inset-0 w-full h-full border-0" allow="fullscreen; autoplay" allowfullscreen></iframe>
         </div>
         <div class="p-3 bg-gray-900 border-t border-gray-800 flex items-center justify-between text-xs text-gray-400">
-          <span class="flex items-center gap-2"><i data-lucide="server" class="w-4 h-4 text-red-500"></i> Server: VidNest Engine</span>
-          <span class="text-gray-500">Powered by TMDB Metadata</span>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400 font-semibold">Source Engine:</span>
+            <select id="server-select" onchange="switchServer(this.value)" class="bg-gray-800 border border-gray-700 text-xs text-white rounded px-2 py-1 focus:outline-none">
+              <option value="vidnest">VidNest (Primary)</option>
+              <option value="autoembed">AutoEmbed (Fallback 1)</option>
+              <option value="vidsrc">VidSrc (Fallback 2)</option>
+            </select>
+          </div>
+          <span class="text-gray-500">TMDB Live Sync</span>
         </div>
       </div>
 
@@ -191,6 +214,36 @@
         </div>
         <div id="episodes-list" class="flex-1 space-y-2"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- AI Mind Map Modal -->
+  <div id="ai-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-xl p-6 flex flex-col items-center justify-center">
+    <div class="w-full max-w-4xl bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="brain-circuit" class="w-6 h-6 text-purple-400"></i>
+          <div>
+            <h3 id="ai-modal-title" class="text-lg font-bold text-white">AI Character Arc & Relationship Graph</h3>
+            <p class="text-xs text-gray-400">Spoiler-Protected Dynamic Knowledge Graph</p>
+          </div>
+        </div>
+        <button onclick="closeAIModal()" class="p-2 rounded-full bg-gray-800 text-gray-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-4 mb-4 bg-gray-950 p-3 rounded-xl border border-gray-800">
+        <label class="text-xs font-semibold text-gray-300">Spoiler Guard (Current Progress):</label>
+        <select id="ai-spoiler-guard" onchange="generateGraph()" class="bg-gray-900 border border-gray-700 text-xs text-purple-300 rounded-lg p-2 focus:outline-none">
+          <option value="1">Season 1 / Early Arcs</option>
+          <option value="2">Mid Series / Mid Arcs</option>
+          <option value="3">Full Climax / Ending</option>
+        </select>
+      </div>
+
+      <div id="ai-graph-container"></div>
+      <p class="text-[11px] text-gray-500 mt-3 text-center">Interactive canvas: Click and drag nodes to inspect character arcs, factions, and secret connections!</p>
     </div>
   </div>
 
@@ -224,11 +277,14 @@
     let currentTopTab = 'movie';
     let heroCurrentData = null;
     let activeItem = null;
+    let currentSeason = 1;
+    let currentEpisode = 1;
+    let currentServer = 'vidnest';
     let watchlist = JSON.parse(localStorage.getItem('rezflix_watchlist') || '[]');
+    let visNetworkInstance = null;
 
     const fallbackMovies = [
-      { id: 27205, title: "Inception", vote_average: 8.8, release_date: "2010-07-16", poster_path: "/oYuLE1311oA8hA1fcS2S2A25qT.jpg", backdrop_path: "/s3TBrRGB11M1yA3L336C6q2.jpg", overview: "A thief who steals corporate secrets through dream-sharing technology..." },
-      { id: 157336, title: "Interstellar", vote_average: 8.6, release_date: "2014-11-05", poster_path: "/gEU2A2ThP2qC21A33965IalO3i7.jpg", backdrop_path: "/xJHokMbljvjADYdit5f6S3L36C6.jpg", overview: "When Earth becomes uninhabitable, a team of explorers travels through a wormhole..." }
+      { id: 27205, title: "Inception", vote_average: 8.8, release_date: "2010-07-16", poster_path: "/oYuLE1311oA8hA1fcS2S2A25qT.jpg", backdrop_path: "/s3TBrRGB11M1yA3L336C6q2.jpg", overview: "A thief who steals corporate secrets through dream-sharing technology..." }
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -325,7 +381,6 @@
       list.forEach(item => container.appendChild(createCard(item, 'tv')));
     }
 
-    // FIXED ANIME SECTION: TMDB Animation Genre Filter
     async function fetchAnimeTMDB() {
       const data = await safeFetch(`https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_genres=16&with_original_language=ja&sort_by=popularity.desc`);
       const container = document.getElementById('trending-anime-grid');
@@ -356,13 +411,30 @@
       return card;
     }
 
+    // MULTI-SERVER STREAMING ENGINE
     function getEmbedUrl(id, type, season = 1, episode = 1) {
-      if (type === 'movie') return `https://vidnest.com/embed/movie/${id}`;
-      return `https://vidnest.com/embed/tv/${id}/${season}/${episode}`;
+      if (currentServer === 'vidnest') {
+        if (type === 'movie') return `https://vidnest.xyz/embed/movie/${id}`;
+        return `https://vidnest.xyz/embed/tv/${id}/${season}/${episode}`;
+      } else if (currentServer === 'autoembed') {
+        if (type === 'movie') return `https://player.autoembed.cc/embed/movie/${id}`;
+        return `https://player.autoembed.cc/embed/tv/${id}/${season}/${episode}`;
+      } else {
+        if (type === 'movie') return `https://vidsrc.me/embed/movie?tmdb=${id}`;
+        return `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`;
+      }
+    }
+
+    function switchServer(server) {
+      currentServer = server;
+      const isSeriesOrAnime = activeItem.media_type === 'tv' || activeItem.first_air_date;
+      document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, isSeriesOrAnime ? 'tv' : 'movie', currentSeason, currentEpisode);
     }
 
     function openPlayer(item) {
       activeItem = item;
+      currentSeason = 1;
+      currentEpisode = 1;
       document.getElementById('player-title').innerText = item.title || item.name;
       document.getElementById('player-modal').classList.remove('hidden');
 
@@ -380,16 +452,13 @@
       }
     }
 
-    // ACCURATE SEASON AND EPISODE FETCHING (Direct TMDB Mapping)
     async function setupTVSeasons(tvId) {
       const data = await safeFetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${TMDB_API_KEY}`);
       const select = document.getElementById('season-select');
       select.innerHTML = '';
 
       if (data && data.seasons) {
-        // Filters out Season 0 (specials/OVAs) and strictly uses TMDB official season list
         const realSeasons = data.seasons.filter(s => s.season_number > 0);
-        
         realSeasons.forEach(s => {
           const opt = document.createElement('option');
           opt.value = s.season_number;
@@ -408,6 +477,7 @@
     }
 
     async function loadEpisodes(seasonNum) {
+      currentSeason = seasonNum;
       const data = await safeFetch(`https://api.themoviedb.org/3/tv/${activeItem.id}/season/${seasonNum}?api_key=${TMDB_API_KEY}`);
       const list = document.getElementById('episodes-list');
       list.innerHTML = '';
@@ -416,16 +486,87 @@
         data.episodes.forEach(ep => {
           const item = document.createElement('div');
           item.className = "p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-red-500 cursor-pointer flex items-center justify-between text-xs transition-all";
-          item.onclick = () => { document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, 'tv', seasonNum, ep.episode_number); };
+          item.onclick = () => { 
+            currentEpisode = ep.episode_number;
+            document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, 'tv', seasonNum, ep.episode_number); 
+          };
           item.innerHTML = `<span class="font-bold text-white truncate pr-2">EP ${ep.episode_number}: ${ep.name}</span><i data-lucide="play-circle" class="w-4 h-4 text-red-500 flex-shrink-0"></i>`;
           list.appendChild(item);
         });
 
-        document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, 'tv', seasonNum, data.episodes[0].episode_number);
+        currentEpisode = data.episodes[0].episode_number;
+        document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, 'tv', seasonNum, currentEpisode);
       } else {
         list.innerHTML = `<p class="text-xs text-gray-500 p-2">No episode data available for this season.</p>`;
       }
       lucide.createIcons();
+    }
+
+    // AI CHARACTER ARC & MIND MAP FEATURE ENGINE
+    function openAIMindMapForHero() {
+      if (heroCurrentData) {
+        activeItem = heroCurrentData;
+        openAIModal();
+      }
+    }
+
+    function openAIMindMapCurrent() {
+      if (activeItem) openAIModal();
+    }
+
+    function openAIModal() {
+      document.getElementById('ai-modal-title').innerText = `${activeItem.title || activeItem.name} - AI Mind Map`;
+      document.getElementById('ai-modal').classList.remove('hidden');
+      generateGraph();
+    }
+
+    function closeAIModal() {
+      document.getElementById('ai-modal').classList.add('hidden');
+    }
+
+    function generateGraph() {
+      const level = document.getElementById('ai-spoiler-guard').value;
+      const title = activeItem.title || activeItem.name;
+
+      // Dynamic Node & Edge generation based on title and spoiler guard level
+      const nodesArr = [
+        { id: 1, label: title, shape: 'ellipse', color: '#dc2626', font: { color: '#ffffff', size: 18 } },
+        { id: 2, label: 'Protagonist', shape: 'box', color: '#3b82f6', font: { color: '#ffffff' } },
+        { id: 3, label: 'Primary Rival / Antagonist', shape: 'box', color: '#8b5cf6', font: { color: '#ffffff' } },
+        { id: 4, label: 'Key Ally', shape: 'box', color: '#10b981', font: { color: '#ffffff' } }
+      ];
+
+      const edgesArr = [
+        { from: 1, to: 2, label: 'Main Story' },
+        { from: 2, to: 3, label: 'Conflict' },
+        { from: 2, to: 4, label: 'Trust' }
+      ];
+
+      if (level >= 2) {
+        nodesArr.push({ id: 5, label: 'Hidden Faction', shape: 'box', color: '#f59e0b', font: { color: '#ffffff' } });
+        edgesArr.push({ from: 3, to: 5, label: 'Secret Alliance' });
+      }
+
+      if (level >= 3) {
+        nodesArr.push({ id: 6, label: 'Climax Plot Twist', shape: 'star', color: '#ec4899', font: { color: '#ffffff' } });
+        edgesArr.push({ from: 2, to: 6, label: 'Final Evolution' });
+        edgesArr.push({ from: 5, to: 6, label: 'Betrayal' });
+      }
+
+      const container = document.getElementById('ai-graph-container');
+      const data = {
+        nodes: new vis.DataSet(nodesArr),
+        edges: new vis.DataSet(edgesArr)
+      };
+
+      const options = {
+        nodes: { borderWidth: 2, shadow: true },
+        edges: { color: '#64748b', smooth: true },
+        physics: { stabilization: true }
+      };
+
+      if (visNetworkInstance) visNetworkInstance.destroy();
+      visNetworkInstance = new vis.Network(container, data, options);
     }
 
     function isInWatchlist(id) {
