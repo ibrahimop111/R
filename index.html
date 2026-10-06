@@ -3,389 +3,610 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RezFlix - Watch Free Movies & TV Shows Online</title>
+  <title>RezFlix - Watch Free Movies, TV Shows & Anime</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0d0e12;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #08090c;
       color: #e2e8f0;
+      overflow-x: hidden;
     }
-    .glass-nav {
-      background: rgba(13, 14, 18, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+    .glass-dock {
+      background: rgba(18, 20, 29, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
+    .glass-modal {
+      background: rgba(13, 15, 23, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #12151e;
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #2a2f42;
-      border-radius: 4px;
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between custom-scrollbar">
+<body class="min-h-screen flex flex-col justify-between hide-scrollbar">
 
-  <!-- Header Navigation -->
-  <header class="fixed top-0 left-0 w-full z-50 glass-nav border-b border-gray-800/60 px-4 lg:px-10 py-3.5 flex items-center justify-between">
-    <!-- Logo & Main Nav -->
-    <div class="flex items-center gap-8">
-      <a href="#" class="flex items-center gap-2">
-        <div class="w-9 h-9 bg-gradient-to-tr from-purple-600 to-indigo-500 rounded-xl flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-indigo-500/30">
-          R
-        </div>
-        <span class="text-2xl font-extrabold tracking-tight text-white">Rez<span class="text-indigo-500">Flix</span></span>
-      </a>
-      
-      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
-        <a href="#" class="text-white hover:text-indigo-400 transition-colors">Home</a>
-        <a href="#" class="hover:text-indigo-400 transition-colors">Movies</a>
-        <a href="#" class="hover:text-indigo-400 transition-colors">TV Series</a>
-        <a href="#" class="hover:text-indigo-400 transition-colors">Trending</a>
-        <a href="#" class="hover:text-indigo-400 transition-colors">Top IMDb</a>
-      </nav>
-    </div>
-
-    <!-- Search Bar & User Control -->
-    <div class="flex items-center gap-4">
-      <div class="relative w-48 sm:w-72">
-        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"></i>
-        <input 
-          type="text" 
-          placeholder="Search movies, TV shows..." 
-          class="w-full bg-gray-900/80 border border-gray-800 text-xs sm:text-sm text-gray-200 pl-9 pr-4 py-2 rounded-full focus:outline-none focus:border-indigo-500 transition-colors"
-        />
+  <!-- Header Section -->
+  <header class="fixed top-0 left-0 w-full z-40 px-4 lg:px-10 py-4 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#" onclick="showHome()" class="flex items-center gap-2.5 z-50">
+      <div class="w-10 h-10 bg-gradient-to-tr from-red-600 to-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/30">
+        <i data-lucide="play" class="w-5 h-5 text-white fill-current ml-0.5"></i>
       </div>
-      <button class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5">
-        <i data-lucide="bookmark" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">Bookmarks</span>
+      <span class="text-2xl font-black tracking-tight text-white">Rez<span class="text-red-500">Flix</span></span>
+    </a>
+
+    <!-- Center Floating Pill Dock (WorldCup removed) -->
+    <nav class="fixed left-1/2 -translate-x-1/2 top-4 hidden md:flex items-center gap-1 glass-dock p-1.5 rounded-full shadow-2xl z-50">
+      <button id="nav-home" onclick="setActiveNav('home')" class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold bg-white/10 text-white transition-all">
+        <i data-lucide="home" class="w-4 h-4"></i> Home
+      </button>
+      <button id="nav-movies" onclick="setActiveNav('movies')" class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold text-gray-400 hover:text-white transition-all">
+        <i data-lucide="clapperboard" class="w-4 h-4"></i> Movies
+      </button>
+      <button id="nav-series" onclick="setActiveNav('series')" class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold text-gray-400 hover:text-white transition-all">
+        <i data-lucide="tv" class="w-4 h-4"></i> Series
+      </button>
+      <button id="nav-anime" onclick="setActiveNav('anime')" class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold text-gray-400 hover:text-white transition-all">
+        <i data-lucide="sparkles" class="w-4 h-4"></i> Anime
+      </button>
+      <button id="nav-categories" onclick="toggleCategories()" class="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold text-gray-400 hover:text-white transition-all">
+        <i data-lucide="layout-grid" class="w-4 h-4"></i> Categories
+      </button>
+    </nav>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-3 z-50">
+      <button onclick="openSearchModal()" class="w-10 h-10 rounded-full bg-gray-900/80 hover:bg-gray-800 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white transition-all">
+        <i data-lucide="search" class="w-4 h-4"></i>
+      </button>
+      <button class="relative w-10 h-10 rounded-full bg-gray-900/80 hover:bg-gray-800 border border-gray-800 flex items-center justify-center text-gray-300 hover:text-white transition-all">
+        <i data-lucide="bell" class="w-4 h-4"></i>
+        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+      </button>
+      <button class="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-white font-semibold text-sm">
+        <i data-lucide="user" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
 
-  <main class="flex-1 pt-20">
-    <!-- Hero Banner / Featured Movie Section -->
-    <section class="relative w-full h-[65vh] min-h-[450px] max-h-[700px] flex items-end">
-      <!-- Background Image with Gradient Overlay -->
-      <div class="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80" 
-          alt="Hero Banner" 
-          class="w-full h-full object-cover object-center"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0d0e12] via-[#0d0e12]/60 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-[#0d0e12] via-[#0d0e12]/40 to-transparent"></div>
+  <!-- Main Content Container -->
+  <main id="app-content" class="flex-1">
+    
+    <!-- Hero Banner Carousel Section -->
+    <section class="relative w-full h-[75vh] min-h-[500px] max-h-[800px] flex items-end">
+      <div id="hero-bg" class="absolute inset-0 z-0 bg-cover bg-center transition-all duration-700">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#08090c] via-[#08090c]/50 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#08090c] via-[#08090c]/40 to-transparent"></div>
       </div>
 
-      <!-- Hero Content -->
-      <div class="relative z-10 px-4 lg:px-12 pb-10 max-w-3xl">
-        <div class="flex items-center gap-3 text-xs font-semibold mb-3">
-          <span class="bg-indigo-600/90 text-white px-2.5 py-0.5 rounded-md">FEATURED</span>
-          <span class="text-amber-400 flex items-center gap-1"><i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i> 8.6</span>
-          <span class="text-gray-400">2026</span>
-          <span class="border border-gray-700 text-gray-300 px-1.5 py-0.2 rounded text-[10px]">4K</span>
-          <span class="text-gray-400">2h 45m</span>
+      <div class="relative z-10 px-6 lg:px-16 pb-12 max-w-4xl">
+        <div class="flex items-center gap-3 text-xs font-bold mb-4">
+          <span id="hero-rating" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-md flex items-center gap-1">
+            <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i> IMDb 8.3
+          </span>
+          <span id="hero-year" class="text-gray-300 bg-gray-800/80 px-2.5 py-1 rounded-md">2026</span>
+          <span id="hero-genres" class="text-gray-400">Drama • Mystery</span>
         </div>
-        <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">Dune: Part Two</h1>
-        <p class="text-gray-300 text-sm sm:text-base line-clamp-3 mb-6 font-normal">
-          Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he endeavors to prevent a terrible future.
+        <h1 id="hero-title" class="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase mb-4 drop-shadow-md">
+          LANTERNS
+        </h1>
+        <p id="hero-desc" class="text-gray-300 text-sm sm:text-base line-clamp-3 mb-8 max-w-2xl font-normal leading-relaxed">
+          Two intergalactic cops, new recruit John Stewart and Lantern legend Hal Jordan, are drawn into a dark, Earth-based mystery as they investigate a murder in the American heartland.
         </p>
-        <div class="flex items-center gap-3">
-          <button class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all transform hover:-translate-y-0.5">
-            <i data-lucide="play" class="w-5 h-5 fill-current"></i> Watch Now
+        <div class="flex items-center gap-4">
+          <button id="hero-play-btn" onclick="openPlayer(heroCurrentData)" class="bg-white hover:bg-gray-200 text-black font-bold px-8 py-3.5 rounded-full flex items-center gap-2 shadow-xl transition-all transform hover:scale-105">
+            <i data-lucide="play" class="w-5 h-5 fill-current"></i> Play
           </button>
-          <button class="bg-gray-800/80 hover:bg-gray-700 text-white font-semibold px-4 py-3 rounded-xl border border-gray-700/80 transition-all">
-            <i data-lucide="plus" class="w-5 h-5"></i>
+          <button onclick="openPlayer(heroCurrentData)" class="bg-gray-900/80 hover:bg-gray-800 text-white font-semibold px-6 py-3.5 rounded-full border border-gray-700/80 flex items-center gap-2 backdrop-blur-md transition-all">
+            <i data-lucide="info" class="w-5 h-5"></i> See more
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Genre / Filter Pills -->
-    <section class="px-4 lg:px-12 py-6 overflow-x-auto custom-scrollbar">
-      <div class="flex items-center gap-2 whitespace-nowrap text-xs font-medium">
-        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg">All Genres</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Action</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Adventure</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Animation</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Comedy</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Crime</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Drama</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Sci-Fi</button>
-        <button class="bg-gray-900/90 text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800/80 px-4 py-2 rounded-lg transition-colors">Thriller</button>
+    <!-- Top Content Today (Ranked 01-05 Carousel Style) -->
+    <section class="px-6 lg:px-16 py-8">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">T O P &nbsp; 1 0</span>
+          <h2 class="text-2xl font-extrabold text-white">Top Content Today</h2>
+        </div>
+        <!-- Toggle Pill -->
+        <div class="bg-gray-900/90 border border-gray-800 p-1 rounded-full flex items-center text-xs font-bold">
+          <button id="toggle-top-movies" onclick="switchTopTab('movie')" class="px-5 py-1.5 rounded-full bg-white/20 text-white transition-all">MOVIES</button>
+          <button id="toggle-top-series" onclick="switchTopTab('tv')" class="px-5 py-1.5 rounded-full text-gray-400 hover:text-white transition-all">SERIES</button>
+        </div>
+      </div>
+      <p class="text-xs text-gray-400 mb-6">Fresh picks hand-tuned every morning so you can jump straight into the stories everyone is talking about today.</p>
+
+      <!-- Horizontal Ranked Cards Slider -->
+      <div id="top-content-grid" class="flex gap-5 overflow-x-auto hide-scrollbar pb-4">
+        <!-- Rendered Dynamically -->
       </div>
     </section>
 
-    <!-- Trending Movies Grid -->
-    <section class="px-4 lg:px-12 py-4">
+    <!-- Trending Series Section -->
+    <section class="px-6 lg:px-16 py-8">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-          <i data-lucide="flame" class="w-5 h-5 text-indigo-500"></i> Trending Movies
-        </h2>
-        <a href="#" class="text-xs text-indigo-400 hover:underline font-medium">View All</a>
+        <div>
+          <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">S E R I E S</span>
+          <h2 class="text-2xl font-extrabold text-white">Trending Series</h2>
+        </div>
+        <button onclick="setActiveNav('series')" class="text-xs border border-gray-800 hover:border-gray-700 bg-gray-900/50 text-gray-300 font-bold px-4 py-2 rounded-full flex items-center gap-1.5 transition-all">
+          VIEW ALL <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+        </button>
       </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <!-- Card 1 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.4
-            </div>
-            <div class="absolute top-2 right-2 bg-indigo-600/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">HD</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Interstellar</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2014</span>
-              <span>Movie</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 7.9
-            </div>
-            <div class="absolute top-2 right-2 bg-indigo-600/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">HD</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Cyberpunk Odyssey</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2025</span>
-              <span>Movie</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 9.0
-            </div>
-            <div class="absolute top-2 right-2 bg-indigo-600/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">4K</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">The Dark Knight</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2008</span>
-              <span>Movie</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.2
-            </div>
-            <div class="absolute top-2 right-2 bg-indigo-600/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">HD</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Shadow Realm</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2026</span>
-              <span>Movie</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 5 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.8
-            </div>
-            <div class="absolute top-2 right-2 bg-indigo-600/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">HD</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Neon Horizon</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2025</span>
-              <span>Movie</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 6 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.1
-            </div>
-            <div class="absolute top-2 right-2 bg-indigo-600/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">4K</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Blade Protocol</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2024</span>
-              <span>Movie</span>
-            </div>
-          </div>
-        </div>
+      <div id="trending-series-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+        <!-- Rendered Dynamically -->
       </div>
     </section>
 
-    <!-- Latest TV Shows Grid -->
-    <section class="px-4 lg:px-12 py-8">
+    <!-- Trending Anime Section (MyAnimeList / Jikan API) -->
+    <section class="px-6 lg:px-16 py-8">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-          <i data-lucide="tv" class="w-5 h-5 text-indigo-500"></i> Popular TV Shows
-        </h2>
-        <a href="#" class="text-xs text-indigo-400 hover:underline font-medium">View All</a>
+        <div>
+          <span class="text-xs font-bold text-red-500 tracking-widest uppercase">A N I M E</span>
+          <h2 class="text-2xl font-extrabold text-white">Top Anime (MyAnimeList)</h2>
+        </div>
+        <button onclick="setActiveNav('anime')" class="text-xs border border-gray-800 hover:border-gray-700 bg-gray-900/50 text-gray-300 font-bold px-4 py-2 rounded-full flex items-center gap-1.5 transition-all">
+          VIEW ALL <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+        </button>
       </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        <!-- TV Card 1 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.9
-            </div>
-            <div class="absolute top-2 right-2 bg-gray-900/90 text-gray-300 text-[10px] font-bold px-1.5 py-0.5 rounded">SS 2 / EP 8</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Arcane Chronicle</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2024</span>
-              <span>TV Show</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- TV Card 2 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1514539079130-25950c84af65?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.5
-            </div>
-            <div class="absolute top-2 right-2 bg-gray-900/90 text-gray-300 text-[10px] font-bold px-1.5 py-0.5 rounded">SS 1 / EP 10</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">The Last Empire</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2026</span>
-              <span>TV Show</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- TV Card 3 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.7
-            </div>
-            <div class="absolute top-2 right-2 bg-gray-900/90 text-gray-300 text-[10px] font-bold px-1.5 py-0.5 rounded">SS 4 / EP 12</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Stranger Secrets</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2025</span>
-              <span>TV Show</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- TV Card 4 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.3
-            </div>
-            <div class="absolute top-2 right-2 bg-gray-900/90 text-gray-300 text-[10px] font-bold px-1.5 py-0.5 rounded">SS 1 / EP 6</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Tokyo Driftwood</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2026</span>
-              <span>TV Show</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- TV Card 5 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 9.1
-            </div>
-            <div class="absolute top-2 right-2 bg-gray-900/90 text-gray-300 text-[10px] font-bold px-1.5 py-0.5 rounded">SS 3 / EP 1</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Vampire Legacy</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2025</span>
-              <span>TV Show</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- TV Card 6 -->
-        <div class="group relative bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800/50 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer">
-          <div class="relative aspect-[2/3] overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=400&q=80" alt="Poster" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-              <i data-lucide="star" class="w-3 h-3 fill-current"></i> 8.6
-            </div>
-            <div class="absolute top-2 right-2 bg-gray-900/90 text-gray-300 text-[10px] font-bold px-1.5 py-0.5 rounded">SS 2 / EP 4</div>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">Silicon Nights</h3>
-            <div class="flex items-center justify-between text-xs text-gray-400 mt-1">
-              <span>2026</span>
-              <span>TV Show</span>
-            </div>
-          </div>
-        </div>
+      <div id="trending-anime-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+        <!-- Rendered Dynamically -->
       </div>
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-[#090a0d] border-t border-gray-800/60 px-4 lg:px-12 py-8 mt-12 text-xs text-gray-500">
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <div class="w-6 h-6 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white text-xs">
-          R
-        </div>
-        <span class="text-lg font-bold text-white">Rez<span class="text-indigo-500">Flix</span></span>
+  <!-- Video Streaming Modal (With Season/Episode/Source Switcher) -->
+  <div id="player-modal" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-md flex flex-col">
+    <!-- Player Bar -->
+    <div class="px-6 py-4 border-b border-gray-800/80 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span id="player-type-badge" class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">MOVIE</span>
+        <h3 id="player-title" class="text-lg font-bold text-white truncate max-w-md">Streaming Title</h3>
       </div>
-      <p class="text-center md:text-left">
-        RezFlix does not store files on its server. All contents are provided by non-affiliated third parties.
-      </p>
-      <div class="flex items-center gap-4 text-gray-400">
-        <a href="#" class="hover:text-indigo-400 transition-colors">Terms</a>
-        <a href="#" class="hover:text-indigo-400 transition-colors">Privacy</a>
-        <a href="#" class="hover:text-indigo-400 transition-colors">DMCA</a>
+      <button onclick="closePlayer()" class="p-2 rounded-full bg-gray-800 text-gray-300 hover:text-white transition-all">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Main Player Area -->
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <!-- Embed Container -->
+      <div class="flex-1 bg-black flex flex-col">
+        <div class="relative w-full flex-1 min-h-[300px]">
+          <iframe id="video-iframe" class="absolute inset-0 w-full h-full border-0" allowfullscreen></iframe>
+        </div>
+        <!-- Source Provider Selector -->
+        <div class="p-4 bg-gray-900/90 border-t border-gray-800 flex items-center gap-3 overflow-x-auto text-xs font-semibold">
+          <span class="text-gray-400">Server:</span>
+          <button onclick="changeProvider('vidsrc')" class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-all">VidSrc</button>
+          <button onclick="changeProvider('vidlink')" class="px-3 py-1.5 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-all">VidLink API</button>
+          <button onclick="changeProvider('vidnest')" class="px-3 py-1.5 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-all">VidNest API</button>
+        </div>
+      </div>
+
+      <!-- TV Show / Anime Episode Selector Sidebar -->
+      <div id="episodes-sidebar" class="w-full lg:w-80 bg-gray-950 border-l border-gray-800/80 p-4 overflow-y-auto hidden flex-col">
+        <h4 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+          <i data-lucide="list-video" class="w-4 h-4 text-red-500"></i> Episodes & Seasons
+        </h4>
+        <div class="mb-4">
+          <label class="text-xs text-gray-400 block mb-1">Select Season</label>
+          <select id="season-select" onchange="loadEpisodes(this.value)" class="w-full bg-gray-900 border border-gray-800 text-xs text-white rounded-lg p-2.5 focus:outline-none focus:border-red-500">
+            <!-- Dynamic Options -->
+          </select>
+        </div>
+        <div id="episodes-list" class="flex-1 space-y-2 custom-scrollbar">
+          <!-- Dynamic Episodes -->
+        </div>
       </div>
     </div>
-  </footer>
+  </div>
+
+  <!-- Search Overlay Modal -->
+  <div id="search-modal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-xl p-6 flex flex-col items-center">
+    <div class="w-full max-w-3xl flex items-center justify-between mb-8">
+      <span class="text-xl font-bold text-white">Search RezFlix</span>
+      <button onclick="closeSearchModal()" class="p-2 rounded-full bg-gray-800 text-gray-300 hover:text-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    
+    <div class="w-full max-w-3xl relative mb-8">
+      <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+      <input 
+        type="text" 
+        id="search-input"
+        oninput="handleSearch(this.value)"
+        placeholder="Search Movies, Series, Anime (MyAnimeList)..." 
+        class="w-full bg-gray-900 border border-gray-800 text-base text-white pl-12 pr-4 py-4 rounded-2xl focus:outline-none focus:border-red-500 shadow-2xl transition-all"
+      />
+    </div>
+
+    <!-- Search Results Container -->
+    <div class="w-full max-w-3xl flex-1 overflow-y-auto hide-scrollbar">
+      <div id="search-results-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <!-- Live Results -->
+      </div>
+    </div>
+  </div>
 
   <script>
-    lucide.createIcons();
+    const TMDB_API_KEY = '3fd2be6f0c70a2a598f084dd27548773'; // Public demo TMDB key
+    let currentTopTab = 'movie';
+    let heroCurrentData = null;
+    let activeItem = null;
+    let currentProvider = 'vidsrc';
+
+    // App Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      fetchHeroContent();
+      fetchTopContent('movie');
+      fetchTrendingSeries();
+      fetchAnimeMAL();
+    });
+
+    // Navigation Toggle
+    function setActiveNav(type) {
+      document.querySelectorAll('nav button').forEach(btn => {
+        btn.className = "flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold text-gray-400 hover:text-white transition-all";
+      });
+      document.getElementById(`nav-${type}`).className = "flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold bg-white/10 text-white transition-all";
+    }
+
+    // Fetch Hero Banner Content
+    async function fetchHeroContent() {
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/trending/tv/day?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const item = data.results[0];
+        heroCurrentData = { ...item, media_type: 'tv' };
+
+        document.getElementById('hero-bg').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${item.backdrop_path})`;
+        document.getElementById('hero-title').innerText = item.name || item.title;
+        document.getElementById('hero-desc').innerText = item.overview;
+        document.getElementById('hero-rating').innerHTML = `<i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i> IMDb ${item.vote_average.toFixed(1)}`;
+        document.getElementById('hero-year').innerText = (item.first_air_date || item.release_date || '2026').substring(0, 4);
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Error fetching hero:", err);
+      }
+    }
+
+    // Switch Top Content Tab (Movies vs Series)
+    function switchTopTab(type) {
+      currentTopTab = type;
+      if (type === 'movie') {
+        document.getElementById('toggle-top-movies').className = "px-5 py-1.5 rounded-full bg-white/20 text-white transition-all";
+        document.getElementById('toggle-top-series').className = "px-5 py-1.5 rounded-full text-gray-400 hover:text-white transition-all";
+      } else {
+        document.getElementById('toggle-top-series').className = "px-5 py-1.5 rounded-full bg-white/20 text-white transition-all";
+        document.getElementById('toggle-top-movies').className = "px-5 py-1.5 rounded-full text-gray-400 hover:text-white transition-all";
+      }
+      fetchTopContent(type);
+    }
+
+    // Fetch Top 10 Ranked Content
+    async function fetchTopContent(type) {
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/trending/${type}/day?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const container = document.getElementById('top-content-grid');
+        container.innerHTML = '';
+
+        data.results.slice(0, 6).forEach((item, index) => {
+          const card = document.createElement('div');
+          card.className = "min-w-[180px] w-[180px] sm:min-w-[210px] sm:w-[210px] relative group cursor-pointer flex-shrink-0";
+          card.onclick = () => openPlayer({ ...item, media_type: type });
+
+          const title = item.title || item.name;
+          const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+          const year = (item.release_date || item.first_air_date || '2026').substring(0, 4);
+
+          card.innerHTML = `
+            <div class="relative aspect-[2/3] rounded-2xl overflow-hidden mb-3 border border-gray-800 group-hover:border-red-500/50 transition-all shadow-lg">
+              <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <!-- Top Rank Badge (01, 02 style) -->
+              <div class="absolute top-0 left-0 bg-red-600 text-white text-xs font-black px-2.5 py-1 rounded-br-xl shadow-md">
+                TOP <br/><span class="text-sm">0${index + 1}</span>
+              </div>
+            </div>
+            <h3 class="text-sm font-bold text-white truncate group-hover:text-red-400 transition-colors">${title}</h3>
+            <div class="flex items-center gap-2 text-xs text-gray-400 mt-1">
+              <span class="text-amber-400 font-semibold flex items-center gap-1"><i data-lucide="star" class="w-3 h-3 fill-current"></i> ${rating}</span>
+              <span>${year}</span>
+              <span class="capitalize">${type}</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Error fetching top content:", err);
+      }
+    }
+
+    // Fetch Trending Series
+    async function fetchTrendingSeries() {
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const container = document.getElementById('trending-series-grid');
+        container.innerHTML = '';
+
+        data.results.slice(0, 6).forEach((item) => {
+          const card = document.createElement('div');
+          card.className = "relative group cursor-pointer";
+          card.onclick = () => openPlayer({ ...item, media_type: 'tv' });
+
+          card.innerHTML = `
+            <div class="relative aspect-[2/3] rounded-2xl overflow-hidden mb-2 border border-gray-800 group-hover:border-red-500/50 transition-all shadow-md">
+              <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            </div>
+            <h3 class="text-xs font-bold text-white truncate group-hover:text-red-400 transition-colors">${item.name}</h3>
+            <p class="text-[11px] text-gray-500 mt-0.5">${(item.first_air_date || '2026').substring(0, 4)} • Series</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Error fetching series:", err);
+      }
+    }
+
+    // Fetch Anime via MyAnimeList / Jikan API
+    async function fetchAnimeMAL() {
+      try {
+        const res = await fetch('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=6');
+        const data = await res.json();
+        const container = document.getElementById('trending-anime-grid');
+        container.innerHTML = '';
+
+        data.data.forEach((item) => {
+          const card = document.createElement('div');
+          card.className = "relative group cursor-pointer";
+          card.onclick = () => openPlayer({ 
+            id: item.mal_id, 
+            title: item.title, 
+            media_type: 'anime', 
+            episodes: item.episodes 
+          });
+
+          card.innerHTML = `
+            <div class="relative aspect-[2/3] rounded-2xl overflow-hidden mb-2 border border-gray-800 group-hover:border-red-500/50 transition-all shadow-md">
+              <img src="${item.images.jpg.large_image_url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <div class="absolute top-2 right-2 bg-red-600/90 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded">MAL</div>
+            </div>
+            <h3 class="text-xs font-bold text-white truncate group-hover:text-red-400 transition-colors">${item.title}</h3>
+            <p class="text-[11px] text-gray-500 mt-0.5">Score: ${item.score} • Anime</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error("Error fetching anime from MAL Jikan API:", err);
+      }
+    }
+
+    // Live Search Functionality (TMDB + MAL Jikan API)
+    async function handleSearch(query) {
+      if (!query.trim()) {
+        document.getElementById('search-results-grid').innerHTML = '';
+        return;
+      }
+      try {
+        const [tmdbRes, malRes] = await Promise.all([
+          fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`),
+          fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=4`)
+        ]);
+
+        const tmdbData = await tmdbRes.json();
+        const malData = await malRes.json();
+        const container = document.getElementById('search-results-grid');
+        container.innerHTML = '';
+
+        // Render TMDB Results
+        tmdbData.results.filter(i => i.poster_path).slice(0, 8).forEach(item => {
+          const card = document.createElement('div');
+          card.className = "cursor-pointer group";
+          card.onclick = () => { closeSearchModal(); openPlayer(item); };
+          card.innerHTML = `
+            <div class="aspect-[2/3] rounded-xl overflow-hidden border border-gray-800 mb-2">
+              <img src="https://image.tmdb.org/t/p/w300${item.poster_path}" class="w-full h-full object-cover group-hover:scale-105 transition-all" />
+            </div>
+            <p class="text-xs font-bold text-white truncate">${item.title || item.name}</p>
+            <p class="text-[10px] text-gray-500 uppercase">${item.media_type}</p>
+          `;
+          container.appendChild(card);
+        });
+
+        // Render MyAnimeList Results
+        if (malData.data) {
+          malData.data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = "cursor-pointer group";
+            card.onclick = () => { 
+              closeSearchModal(); 
+              openPlayer({ id: item.mal_id, title: item.title, media_type: 'anime', episodes: item.episodes }); 
+            };
+            card.innerHTML = `
+              <div class="aspect-[2/3] rounded-xl overflow-hidden border border-gray-800 mb-2 relative">
+                <img src="${item.images.jpg.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition-all" />
+                <span class="absolute top-1 right-1 bg-red-600 text-[8px] px-1 rounded text-white font-bold">MAL</span>
+              </div>
+              <p class="text-xs font-bold text-white truncate">${item.title}</p>
+              <p class="text-[10px] text-gray-500 uppercase">Anime</p>
+            `;
+            container.appendChild(card);
+          });
+        }
+      } catch (err) {
+        console.error("Search error:", err);
+      }
+    }
+
+    // Open Player & Load Video Stream
+    async function openPlayer(item) {
+      activeItem = item;
+      const modal = document.getElementById('player-modal');
+      const iframe = document.getElementById('video-iframe');
+      const titleEl = document.getElementById('player-title');
+      const sidebar = document.getElementById('episodes-sidebar');
+
+      titleEl.innerText = item.title || item.name;
+      modal.classList.remove('hidden');
+
+      const isTV = item.media_type === 'tv' || item.first_air_date;
+      const isAnime = item.media_type === 'anime';
+
+      if (isTV) {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        document.getElementById('player-type-badge').innerText = 'TV SERIES';
+        await setupTVSeasons(item.id);
+      } else if (isAnime) {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
+        document.getElementById('player-type-badge').innerText = 'ANIME';
+        setupAnimeEpisodes(item);
+      } else {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
+        document.getElementById('player-type-badge').innerText = 'MOVIE';
+        iframe.src = getEmbedUrl(item.id, 'movie');
+      }
+    }
+
+    // Embed Provider URL Routing (VidSrc / VidLink / VidNest API)
+    function getEmbedUrl(id, type, season = 1, episode = 1) {
+      if (type === 'movie') {
+        if (currentProvider === 'vidlink') return `https://vidlink.pro/movie/${id}`;
+        if (currentProvider === 'vidnest') return `https://vidnest.xyz/embed/movie/${id}`;
+        return `https://vidsrc.to/embed/movie/${id}`;
+      } else if (type === 'tv') {
+        if (currentProvider === 'vidlink') return `https://vidlink.pro/tv/${id}/${season}/${episode}`;
+        if (currentProvider === 'vidnest') return `https://vidnest.xyz/embed/tv/${id}/${season}/${episode}`;
+        return `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`;
+      } else if (type === 'anime') {
+        // VidLink / VidNest Anime embed API endpoint fallback
+        return `https://vidlink.pro/anime/${id}/${episode}`;
+      }
+    }
+
+    function changeProvider(provider) {
+      currentProvider = provider;
+      if (activeItem) openPlayer(activeItem);
+    }
+
+    // Setup TV Show Seasons & Episode List
+    async function setupTVSeasons(tvId) {
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const select = document.getElementById('season-select');
+        select.innerHTML = '';
+
+        data.seasons.filter(s => s.season_number > 0).forEach(season => {
+          const opt = document.createElement('option');
+          opt.value = season.season_number;
+          opt.innerText = `Season ${season.season_number} (${season.episode_count} Episodes)`;
+          select.appendChild(opt);
+        });
+
+        loadEpisodes(1);
+      } catch (err) {
+        console.error("TV setup error:", err);
+      }
+    }
+
+    // Load Episodes for Selected Season
+    async function loadEpisodes(seasonNum) {
+      try {
+        const res = await fetch(`https://api.themoviedb.org/3/tv/${activeItem.id}/season/${seasonNum}?api_key=${TMDB_API_KEY}`);
+        const data = await res.json();
+        const list = document.getElementById('episodes-list');
+        list.innerHTML = '';
+
+        data.episodes.forEach(ep => {
+          const item = document.createElement('div');
+          item.className = "p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-red-500 cursor-pointer flex items-center justify-between text-xs transition-all";
+          item.onclick = () => {
+            document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, 'tv', seasonNum, ep.episode_number);
+          };
+          item.innerHTML = `
+            <span class="font-bold text-white">EP ${ep.episode_number}: ${ep.name}</span>
+            <i data-lucide="play-circle" class="w-4 h-4 text-red-500"></i>
+          `;
+          list.appendChild(item);
+        });
+
+        // Set initial stream
+        document.getElementById('video-iframe').src = getEmbedUrl(activeItem.id, 'tv', seasonNum, 1);
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Episode load error:", err);
+      }
+    }
+
+    // Setup Anime Episodes List (MAL API)
+    function setupAnimeEpisodes(item) {
+      const select = document.getElementById('season-select');
+      select.innerHTML = '<option value="1">Season 1</option>';
+
+      const list = document.getElementById('episodes-list');
+      list.innerHTML = '';
+      const totalEps = item.episodes || 12;
+
+      for (let i = 1; i <= Math.min(totalEps, 24); i++) {
+        const epItem = document.createElement('div');
+        epItem.className = "p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-red-500 cursor-pointer flex items-center justify-between text-xs transition-all";
+        epItem.onclick = () => {
+          document.getElementById('video-iframe').src = getEmbedUrl(item.id, 'anime', 1, i);
+        };
+        epItem.innerHTML = `
+          <span class="font-bold text-white">Episode ${i}</span>
+          <i data-lucide="play-circle" class="w-4 h-4 text-red-500"></i>
+        `;
+        list.appendChild(epItem);
+      }
+
+      document.getElementById('video-iframe').src = getEmbedUrl(item.id, 'anime', 1, 1);
+      lucide.createIcons();
+    }
+
+    function closePlayer() {
+      document.getElementById('player-modal').classList.add('hidden');
+      document.getElementById('video-iframe').src = '';
+    }
+
+    function openSearchModal() {
+      document.getElementById('search-modal').classList.remove('hidden');
+      document.getElementById('search-input').focus();
+    }
+
+    function closeSearchModal() {
+      document.getElementById('search-modal').classList.add('hidden');
+    }
+
+    function toggleCategories() {
+      alert("Categories overlay requested.");
+    }
+
+    function showHome() {
+      setActiveNav('home');
+    }
   </script>
 </body>
 </html>
