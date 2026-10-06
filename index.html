@@ -191,7 +191,7 @@
           <iframe id="video-iframe" class="absolute inset-0 w-full h-full border-0" allowfullscreen></iframe>
         </div>
         
-        <!-- Multi-Server Selector (12 Servers) -->
+        <!-- Multi-Server Selector (12 Servers including 3 Anime servers) -->
         <div class="p-3 bg-gray-950 border-t border-white/10 flex items-center gap-2 overflow-x-auto text-xs font-bold hide-scrollbar shrink-0">
           <span class="text-gray-400 whitespace-nowrap px-1">Servers:</span>
           <button id="server-vidnest" onclick="changeProvider('vidnest')" class="px-3.5 py-2 rounded-xl bg-red-600 text-white whitespace-nowrap transition-all shadow-lg shadow-red-600/30">VidNest</button>
@@ -257,7 +257,7 @@
         </div>
         <div>
           <h3 class="text-sm font-black text-white">RezAI Assistant</h3>
-          <p class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">● Online & Ready</p>
+          <p class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">● Powered by Gemini</p>
         </div>
       </div>
       <button onclick="toggleAiModal()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all">
@@ -269,7 +269,7 @@
       <div class="flex items-start gap-2">
         <div class="w-7 h-7 rounded-lg bg-red-600/30 border border-red-500/40 flex items-center justify-center text-red-400 font-bold shrink-0">AI</div>
         <div class="bg-white/5 border border-white/10 p-3 rounded-2xl text-gray-200 leading-relaxed">
-          Hey there! I'm your RezAI guide. Looking for the best sci-fi movie, top-rated anime, or sports highlights tonight? Ask me anything!
+          Hey there! I'm RezAI. Ask me for personalized movie recommendations, anime marathons, or sports highlights!
         </div>
       </div>
     </div>
@@ -654,8 +654,9 @@
     function openAiWithContext() {
       toggleAiModal();
       if (heroCurrentData) {
-        appendAiMessage("User", `Can you tell me more about ${heroCurrentData.title || heroCurrentData.name} and give me similar recommendations?`);
-        callGemini(`Tell me about ${heroCurrentData.title || heroCurrentData.name} and recommend 3 similar movies/shows.`);
+        const title = heroCurrentData.title || heroCurrentData.name;
+        document.getElementById('ai-user-input').value = `Tell me about ${title} and recommend 3 similar movies.`;
+        sendAiMessage();
       }
     }
 
@@ -667,50 +668,73 @@
       appendAiMessage("User", text);
       input.value = '';
 
-      await callGemini(text);
+      // Add loading state bubble
+      const loadingId = appendAiMessage("AI", "RezAI is thinking...", true);
+
+      try {
+        const reply = await callGeminiAPI(text);
+        removeAiMessage(loadingId);
+        appendAiMessage("AI", reply);
+      } catch (err) {
+        removeAiMessage(loadingId);
+        appendAiMessage("AI", "Error connecting to Gemini: " + err.message);
+      }
     }
 
-    function appendAiMessage(sender, text) {
+    function appendAiMessage(sender, text, isLoading = false) {
       const container = document.getElementById('ai-chat-messages');
       const isUser = sender === "User";
       const div = document.createElement('div');
+      const msgId = 'msg-' + Math.random().toString(36.substr(2, 9));
+      div.id = msgId;
       div.className = `flex items-start gap-2 ${isUser ? 'flex-row-reverse' : ''}`;
       
       div.innerHTML = `
         <div class="w-7 h-7 rounded-lg ${isUser ? 'bg-white/20 text-white' : 'bg-red-600/30 border border-red-500/40 text-red-400'} flex items-center justify-center font-bold shrink-0 text-[10px]">${isUser ? 'U' : 'AI'}</div>
-        <div class="${isUser ? 'bg-red-600 text-white' : 'bg-white/5 border border-white/10 text-gray-200'} p-3 rounded-2xl text-xs leading-relaxed max-w-[80%]">
+        <div class="${isUser ? 'bg-red-600 text-white' : 'bg-white/5 border border-white/10 text-gray-200'} p-3 rounded-2xl text-xs leading-relaxed max-w-[80%] ${isLoading ? 'animate-pulse text-red-400 font-semibold' : ''}">
           ${text}
         </div>
       `;
       container.appendChild(div);
       container.scrollTop = container.scrollHeight;
+      return msgId;
     }
 
-    async function callGemini(prompt) {
+    function removeAiMessage(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    async function callGeminiAPI(prompt) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
       
       const payload = {
+        system_instruction: {
+          parts: [{ text: "You are RezAI, an expert, enthusiastic AI streaming and sports assistant on the RezFlix platform. Help users discover the best movies, TV series, anime masterpieces, and live sports highlights. Keep your answers engaging, well-formatted, and concise." }]
+        },
         contents: [
           {
             role: "user",
-            parts: [{ text: "You are RezAI, a helpful streaming assistant on RezFlix website. Help users find movies, series, anime, or sports. User prompt: " + prompt }]
+            parts: [{ text: prompt }]
           }
         ]
       };
 
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "I recommend checking out our top trending movies or anime!";
-        appendAiMessage("RezAI", reply);
-      } catch (err) {
-        console.error(err);
-        appendAiMessage("RezAI", "Oops! I encountered an error connecting to Gemini. Try asking again.");
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error?.message || `HTTP status ${res.status}`);
       }
+
+      const data = await res.json();
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!reply) throw new Error("No response received from Gemini.");
+      return reply;
     }
   </script>
 </body>
