@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RezFlix Ultra - Next-Gen Entertainment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            neon: '#ff2e63',
+                            purple: '#9d4edd',
+                            cyan: '#00f5d4'
+                        },
+                        dark: {
+                            bg: '#050608',
+                            card: '#0e1117',
+                            border: '#1f2430',
+                            glow: '#181e2a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 25px -5px rgba(244, 63, 94, 0.4)',
+                        'purple-glow': '0 0 25px -5px rgba(157, 78, 221, 0.4)',
+                        'cyan-glow': '0 0 25px -5px rgba(0, 245, 212, 0.4)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #050608;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(14, 17, 23, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-pill {
+            background: rgba(18, 22, 31, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Custom Animated Glowing Elements */
+        .glow-brand {
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.35);
+        }
+
+        /* Equalizer Animation for Music Bar */
+        @keyframes eq {
+            0%, 100% { height: 4px; }
+            50% { height: 18px; }
+        }
+        .eq-bar-1 { animation: eq 0.8s infinite ease-in-out; }
+        .eq-bar-2 { animation: eq 1.1s infinite ease-in-out 0.2s; }
+        .eq-bar-3 { animation: eq 0.6s infinite ease-in-out 0.4s; }
+        .eq-bar-4 { animation: eq 0.9s infinite ease-in-out 0.1s; }
+
+        /* Hide scrollbars but keep functional */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom Scrollbar for sidebars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050608;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2430;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f43f5e;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white pb-24">
+
+    <header class="fixed top-4 left-0 right-0 z-40 px-4 flex justify-center">
+        <nav class="glass-pill rounded-full px-4 py-2.5 flex items-center justify-between gap-2 md:gap-6 max-w-6xl w-full shadow-2xl transition-all duration-300">
+            <!-- Brand Logo -->
+            <a href="#" onclick="switchTab('home')" class="flex items-center gap-2 group cursor-pointer">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-600 via-brand-500 to-brand-purple flex items-center justify-center shadow-neon group-hover:scale-105 transition-transform">
+                    <i data-lucide="play" class="w-5 h-5 text-white fill-white ml-0.5"></i>
+                </div>
+                <span class="text-xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-brand-500">
+                    REZFLIX<span class="text-xs text-brand-500 font-normal ml-1 px-1.5 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/20">ULTRA</span>
+                </span>
+            </a>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 text-xs font-semibold">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-1.5 rounded-full text-white bg-brand-600 shadow-md transition-all">All</button>
+                <button onclick="switchTab('movies')" id="nav-movies" class="nav-btn px-4 py-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all">Movies</button>
+                <button onclick="switchTab('series')" id="nav-series" class="nav-btn px-4 py-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all">TV Shows</button>
+                <button onclick="switchTab('anime')" id="nav-anime" class="nav-btn px-4 py-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all">Anime</button>
+                <button onclick="switchTab('sports')" id="nav-sports" class="nav-btn px-4 py-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Sports Arena
+                </button>
+                <button onclick="switchTab('music')" id="nav-music" class="nav-btn px-4 py-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+                    <i data-lucide="music" class="w-3.5 h-3.5 text-brand-cyan"></i>
+                    RezMusic
+                </button>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex items-center gap-2">
+                <!-- Search Button -->
+                <button onclick="openSearchModal()" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 transition-all flex items-center gap-2">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span class="hidden lg:inline text-xs font-medium text-gray-400 pr-1">Search...</span>
+                </button>
+
+                <!-- Watchlist Toggle Button -->
+                <button onclick="openWatchlistModal()" class="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 transition-all relative">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    <span id="watchlist-badge" class="hidden absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brand-500 text-[10px] font-bold text-white flex items-center justify-center">0</span>
+                </button>
+
+                <!-- AI Assistant Trigger Button -->
+                <button onclick="toggleAiModal()" class="p-2.5 rounded-full bg-gradient-to-r from-brand-purple to-brand-500 text-white shadow-purple-glow hover:opacity-90 transition-all flex items-center gap-1.5">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span class="hidden md:inline text-xs font-bold">RezAI</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="md:hidden fixed bottom-16 left-0 right-0 z-30 px-4 py-2 flex justify-center">
+        <div class="glass-pill rounded-full px-4 py-2 flex items-center justify-between w-full max-w-md shadow-2xl border border-white/10 text-xs font-medium text-gray-400">
+            <button onclick="switchTab('home')" class="m-nav-btn flex flex-col items-center gap-1 text-brand-500" id="mnav-home">
+                <i data-lucide="compass" class="w-4 h-4"></i>
+                <span class="text-[10px]">Home</span>
+            </button>
+            <button onclick="switchTab('movies')" class="m-nav-btn flex flex-col items-center gap-1" id="mnav-movies">
+                <i data-lucide="film" class="w-4 h-4"></i>
+                <span class="text-[10px]">Movies</span>
+            </button>
+            <button onclick="switchTab('series')" class="m-nav-btn flex flex-col items-center gap-1" id="mnav-series">
+                <i data-lucide="tv" class="w-4 h-4"></i>
+                <span class="text-[10px]">Series</span>
+            </button>
+            <button onclick="switchTab('anime')" class="m-nav-btn flex flex-col items-center gap-1" id="mnav-anime">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                <span class="text-[10px]">Anime</span>
+            </button>
+            <button onclick="switchTab('sports')" class="m-nav-btn flex flex-col items-center gap-1" id="mnav-sports">
+                <i data-lucide="trophy" class="w-4 h-4"></i>
+                <span class="text-[10px]">Sports</span>
+            </button>
+            <button onclick="switchTab('music')" class="m-nav-btn flex flex-col items-center gap-1" id="mnav-music">
+                <i data-lucide="music" class="w-4 h-4"></i>
+                <span class="text-[10px]">Music</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="pt-24 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full flex-grow">
+
+        <section id="hero-section" class="relative rounded-3xl overflow-hidden glass-card mb-12 border border-white/10 group min-h-[420px] md:min-h-[500px] flex items-end">
+            <!-- Background Backdrop Image -->
+            <div id="hero-bg" class="absolute inset-0 bg-cover bg-center transition-all duration-700 transform group-hover:scale-105" style="background-image: url('https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1600');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/60 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-dark-bg via-dark-bg/70 to-transparent"></div>
+
+            <!-- Hero Content -->
+            <div class="relative z-10 p-6 md:p-12 max-w-2xl space-y-4">
+                <div class="flex items-center gap-2">
+                    <span id="hero-badge" class="px-3 py-1 rounded-full bg-brand-500/20 border border-brand-500/40 text-brand-500 text-xs font-extrabold uppercase tracking-wider">Featured Release</span>
+                    <span id="hero-rating" class="text-amber-400 text-xs font-bold flex items-center gap-1">
+                        <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i> 8.9 TMDB
+                    </span>
+                </div>
+                
+                <h1 id="hero-title" class="text-3xl md:text-5xl font-black text-white leading-tight">Arcane: League of Legends</h1>
+                <p id="hero-desc" class="text-gray-300 text-sm md:text-base line-clamp-3 leading-relaxed">
+                    Set in the utopian region of Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League champions-and the power that will tear them apart.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 pt-2">
+                    <button id="hero-play-btn" onclick="playMedia('tv', 94605, 'Arcane', 1, 1)" class="px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm flex items-center gap-2 shadow-neon transition-all hover:scale-105">
+                        <i data-lucide="play" class="w-4 h-4 fill-white"></i> Watch Now
+                    </button>
+                    <button id="hero-watchlist-btn" onclick="toggleWatchlist({id: 94605, title: 'Arcane', type: 'tv', poster: 'https://image.tmdb.org/t/p/w500/absc1s82pXy41C25088921.jpg'})" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm flex items-center gap-2 border border-white/10 transition-all">
+                        <i data-lucide="bookmark" class="w-4 h-4"></i> Add to Watchlist
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="media-view" class="space-y-12">
+            <!-- Dynamic Category Rows Generated via JS -->
+            <div id="dynamic-rows" class="space-y-10">
+                <!-- Content will be injected dynamically -->
+            </div>
+        </section>
+
+        <section id="sports-view" class="hidden space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-white flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-6 h-6 text-amber-400"></i> RezSports Arena Live
+                    </h2>
+                    <p class="text-sm text-gray-400">HD Live Sports Streams, Match Highlights & Instant Scores</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-4 py-1.5 rounded-lg bg-brand-500/20 text-brand-500 border border-brand-500/30 text-xs font-bold">Live Matches</button>
+                    <button class="px-4 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white border border-white/10 text-xs font-medium">Highlights</button>
+                </div>
+            </div>
+
+            <!-- Live Matches Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Match Card 1 -->
+                <div class="glass-card rounded-2xl p-5 border border-white/10 relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-500 text-[10px] font-extrabold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> LIVE 74'
+                        </span>
+                        <span class="text-xs text-gray-400 font-medium">UEFA Champions League</span>
+                    </div>
+                    <div class="flex justify-between items-center py-4 border-y border-white/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-sm text-amber-400">RMA</div>
+                            <span class="font-bold text-sm text-white">Real Madrid</span>
+                        </div>
+                        <span class="text-xl font-black text-white">2 - 1</span>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-sm text-white">FC Barcelona</span>
+                            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-sm text-blue-400">BAR</div>
+                        </div>
+                    </div>
+                    <button onclick="playSportsStream('El Clasico Live HD', 'https://www.youtube.com/embed/live_stream?channel=UC4i_9WvfPRTuR651C80efn0')" class="w-full mt-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-neon transition-all">
+                        <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i> Watch Stream HD
+                    </button>
+                </div>
+
+                <!-- Match Card 2 -->
+                <div class="glass-card rounded-2xl p-5 border border-white/10 relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-extrabold">UPCOMING - 20:00</span>
+                        <span class="text-xs text-gray-400 font-medium">NBA Regular Season</span>
+                    </div>
+                    <div class="flex justify-between items-center py-4 border-y border-white/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm">LAK</div>
+                            <span class="font-bold text-sm text-white">Lakers</span>
+                        </div>
+                        <span class="text-xs font-bold text-gray-500">VS</span>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-sm text-white">Warriors</span>
+                            <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">GSW</div>
+                        </div>
+                    </div>
+                    <button onclick="playSportsStream('Lakers vs Warriors Stream', 'https://www.youtube.com/embed/2g811Ko7g2A')" class="w-full mt-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition-all">
+                        <i data-lucide="bell" class="w-3.5 h-3.5"></i> Set Stream Reminder
+                    </button>
+                </div>
+
+                <!-- Match Card 3 -->
+                <div class="glass-card rounded-2xl p-5 border border-white/10 relative overflow-hidden group hover:border-brand-500/50 transition-all">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-500 text-[10px] font-extrabold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> LIVE
+                        </span>
+                        <span class="text-xs text-gray-400 font-medium">Formula 1 Grand Prix</span>
+                    </div>
+                    <div class="py-2 border-y border-white/5 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-white font-bold">1. Max Verstappen (RB)</span>
+                            <span class="text-emerald-400 font-mono">Leader</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-300">2. Lewis Hamilton (MER)</span>
+                            <span class="text-gray-400 font-mono">+1.242s</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-300">3. Charles Leclerc (FER)</span>
+                            <span class="text-gray-400 font-mono">+3.810s</span>
+                        </div>
+                    </div>
+                    <button onclick="playSportsStream('Formula 1 Grand Prix Main Stream', 'https://www.youtube.com/embed/5qap5aO4i9A')" class="w-full mt-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-neon transition-all">
+                        <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i> Stream Cockpit View
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="music-view" class="hidden space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-white flex items-center gap-2">
+                        <i data-lucide="music" class="w-6 h-6 text-brand-cyan"></i> RezMusic Audio Engine
+                    </h2>
+                    <p class="text-sm text-gray-400">Stream uninterrupted high quality audio playlists powered by YouTube</p>
+                </div>
+
+                <!-- Music Search Input -->
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <input type="text" id="music-search-input" placeholder="Search song or artist..." class="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-cyan w-full md:w-64">
+                    <button onclick="searchAndPlayMusic()" class="px-4 py-2 rounded-xl bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30 text-xs font-bold hover:bg-brand-cyan/30 transition-all">Search</button>
+                </div>
+            </div>
+
+            <!-- Music Playlists Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="playlist-grid">
+                <!-- Music cards populated dynamically -->
+            </div>
+        </section>
+
+    </main>
+
+    <div id="music-player-bar" class="fixed bottom-0 left-0 right-0 z-40 glass-pill border-t border-white/10 px-4 py-3 flex items-center justify-between gap-4 shadow-2xl transition-transform duration-300 translate-y-full">
+        <!-- Track Info -->
+        <div class="flex items-center gap-3 w-1/4">
+            <img id="music-cover" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=200" class="w-12 h-12 rounded-lg object-cover shadow-md border border-white/10" alt="Cover">
+            <div class="overflow-hidden">
+                <h4 id="music-track-title" class="text-xs font-bold text-white truncate">Starboy</h4>
+                <p id="music-track-artist" class="text-[11px] text-gray-400 truncate">The Weeknd, Daft Punk</p>
+            </div>
+        </div>
+
+        <!-- Controls & Timeline -->
+        <div class="flex flex-col items-center gap-1.5 w-2/4 max-w-md">
+            <div class="flex items-center gap-4">
+                <button onclick="prevTrack()" class="text-gray-400 hover:text-white transition-all"><i data-lucide="skip-back" class="w-4 h-4"></i></button>
+                <button id="music-play-toggle" onclick="toggleMusicPlay()" class="w-8 h-8 rounded-full bg-brand-cyan text-dark-bg flex items-center justify-center font-bold hover:scale-105 transition-all shadow-cyan-glow">
+                    <i data-lucide="pause" class="w-4 h-4 fill-dark-bg"></i>
+                </button>
+                <button onclick="nextTrack()" class="text-gray-400 hover:text-white transition-all"><i data-lucide="skip-forward" class="w-4 h-4"></i></button>
+            </div>
+            <!-- Animated Equalizer Indicator -->
+            <div class="flex items-center gap-1 h-4">
+                <div class="w-1 bg-brand-cyan rounded-full eq-bar-1"></div>
+                <div class="w-1 bg-brand-cyan rounded-full eq-bar-2"></div>
+                <div class="w-1 bg-brand-cyan rounded-full eq-bar-3"></div>
+                <div class="w-1 bg-brand-cyan rounded-full eq-bar-4"></div>
+            </div>
+        </div>
+
+        <!-- Extra Controls -->
+        <div class="flex items-center justify-end gap-3 w-1/4">
+            <i data-lucide="volume-2" class="w-4 h-4 text-gray-400"></i>
+            <button onclick="closeMusicBar()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <!-- Hidden YouTube iFrame Player for Audio Engine -->
+        <div class="hidden">
+            <iframe id="youtube-audio-iframe" width="100" height="100" src="" allow="autoplay"></iframe>
+        </div>
+    </div>
+
+    <div id="player-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-2 md:p-6 transition-opacity">
+        <div class="glass-panel w-full max-w-6xl rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col max-h-[92vh]">
+            <!-- Header Bar -->
+            <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/5">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-brand-500 animate-ping"></span>
+                    <h3 id="modal-media-title" class="text-base font-bold text-white truncate">Streaming Title</h3>
+                </div>
+                <button onclick="closePlayerModal()" class="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Main Content Body -->
+            <div class="flex flex-col lg:flex-row flex-grow overflow-hidden">
+                <!-- Video Container -->
+                <div class="flex-grow bg-black flex items-center justify-center relative">
+                    <div class="w-full h-full video-container">
+                        <iframe id="embed-iframe" src="" allowfullscreen allow="autoplay"></iframe>
+                    </div>
+                </div>
+
+                <!-- Server & Season Episode Controls Sidebar -->
+                <div class="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 p-4 space-y-4 overflow-y-auto bg-dark-card/60">
+                    <!-- Server Selector -->
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Select Server</label>
+                        <div class="grid grid-cols-2 gap-2" id="server-btn-group">
+                            <button onclick="changeServer('vidnest')" id="srv-vidnest" class="px-3 py-2 rounded-xl bg-brand-600 text-white font-bold text-xs shadow-neon transition-all">VidNest (.fun)</button>
+                            <button onclick="changeServer('vidlink')" id="srv-vidlink" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-semibold text-xs border border-white/10 transition-all">VidLink</button>
+                            <button onclick="changeServer('embedsu')" id="srv-embedsu" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-semibold text-xs border border-white/10 transition-all">Embed.su</button>
+                            <button onclick="changeServer('anikoto')" id="srv-anikoto" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-semibold text-xs border border-white/10 transition-all">AniKoto</button>
+                        </div>
+                    </div>
+
+                    <!-- TV Series / Anime Controls (Seasons/Episodes) -->
+                    <div id="tv-controls" class="space-y-3 hidden">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Episodes</label>
+                            <select id="season-select" onchange="loadEpisodesForSeason()" class="bg-white/5 border border-white/10 text-xs font-bold text-white rounded-lg px-2 py-1 focus:outline-none">
+                                <option value="1">Season 1</option>
+                                <option value="2">Season 2</option>
+                            </select>
+                        </div>
+                        <div id="episode-list" class="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto pr-1">
+                            <!-- Episode buttons injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Media Description -->
+                    <div class="pt-2 border-t border-white/5">
+                        <span class="text-[11px] text-gray-500 font-semibold block mb-1">Server Status:</span>
+                        <div class="flex items-center gap-2 text-xs text-emerald-400 font-medium">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Stream Server Online (VidNest.fun active)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="search-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden p-4 md:p-8 overflow-y-auto">
+        <div class="max-w-4xl mx-auto space-y-6">
+            <div class="flex items-center justify-between">
+                <div class="relative w-full">
+                    <i data-lucide="search" class="w-6 h-6 text-brand-500 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="search-input" onkeyup="handleSearchInput(event)" placeholder="Search movies, anime, tv series..." class="w-full bg-white/10 border border-white/20 rounded-2xl pl-14 pr-4 py-4 text-white placeholder-gray-400 text-lg focus:outline-none focus:border-brand-500 shadow-2xl">
+                </div>
+                <button onclick="closeSearchModal()" class="ml-4 p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Search Results Container -->
+            <div id="search-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="watchlist-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden p-4 md:p-8 overflow-y-auto">
+        <div class="max-w-5xl mx-auto space-y-6">
+            <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                <h2 class="text-2xl font-black text-white flex items-center gap-2">
+                    <i data-lucide="bookmark" class="w-6 h-6 text-brand-500"></i> My Watchlist
+                </h2>
+                <button onclick="closeWatchlistModal()" class="p-2 rounded-xl bg-white/10 text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="watchlist-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                <!-- Watchlist content loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-modal" class="fixed bottom-20 right-4 z-50 w-full max-w-sm glass-panel rounded-3xl shadow-2xl border border-brand-purple/40 hidden flex-col overflow-hidden h-[480px]">
+        <div class="p-4 bg-gradient-to-r from-brand-purple to-brand-500 text-white flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                <span class="font-bold text-sm">RezAI Smart Recommendations</span>
+            </div>
+            <button onclick="toggleAiModal()" class="text-white hover:opacity-80"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div id="ai-chat-body" class="p-4 flex-grow overflow-y-auto space-y-3 text-xs">
+            <div class="p-3 rounded-2xl bg-white/10 text-gray-200">
+                Hey! I'm RezAI. Ask me for movie, anime, or music playlist recommendations! Try "Recommend cyberpunk anime" or "Best action movies 2024".
+            </div>
+        </div>
+        <div class="p-3 border-t border-white/10 flex gap-2">
+            <input type="text" id="ai-input" placeholder="Ask RezAI..." onkeypress="if(event.key==='Enter') sendAiMessage()" class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-purple">
+            <button onclick="sendAiMessage()" class="px-3 py-2 bg-brand-purple rounded-xl text-white font-bold text-xs"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Key API configurations
+        const TMDB_KEY = '3fd2be6f0c70a2a598f084dd27548780';
+        const TMDB_BASE = 'https://api.themoviedb.org/3';
+        const IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
+
+        // State variables
+        let currentTab = 'home';
+        let currentMedia = { type: 'movie', id: 0, title: '', season: 1, episode: 1 };
+        let currentServer = 'vidnest';
+        let watchlist = JSON.parse(localStorage.getItem('rezflix_watchlist') || '[]');
+
+        // YouTube Audio Engine Music Tracks
+        const MUSIC_PLAYLISTS = [
+            { id: '1', title: 'Starboy', artist: 'The Weeknd', ytId: '34Na4j8AVgA', cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300' },
+            { id: '2', title: 'Blinding Lights', artist: 'The Weeknd', ytId: '4NRXx6U8ABQ', cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=300' },
+            { id: '3', title: 'Desi Hip Hop Hits', artist: 'Top Punjabi/Pakistani', ytId: 'cl0a3i2wFzA', cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=300' },
+            { id: '4', title: 'Synthwave Midnight Cyber', artist: 'Lofi Cyberpunk', ytId: '4xDzrJKXOOY', cover: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=300' },
+            { id: '5', title: 'Gym Phonk Aggressive', artist: 'Drift & Workout', ytId: '1-s8GVgD1og', cover: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=300' },
+            { id: '6', title: 'Anime Epic OSTs', artist: 'Attack on Titan & Solo Leveling', ytId: 'W3q8Od5qJio', cover: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=300' }
+        ];
+        let currentTrackIndex = 0;
+
+        // On Page Load Initialization
+        window.onload = function() {
+            lucide.createIcons();
+            loadHomeFeed();
+            loadMusicPlaylists();
+            updateWatchlistBadge();
+        };
+
+        async function fetchTMDB(endpoint) {
+            try {
+                const res = await fetch(`${TMDB_BASE}${endpoint}?api_key=${TMDB_KEY}&include_adult=false`);
+                return await res.json();
+            } catch (err) {
+                console.error('TMDB Fetch Error:', err);
+                return null;
+            }
+        }
+
+        async function loadHomeFeed() {
+            const container = document.getElementById('dynamic-rows');
+            container.innerHTML = '';
+
+            const sections = [
+                { title: '🔥 Trending Movies', endpoint: '/trending/movie/week' },
+                { title: '📺 Top TV Series', endpoint: '/trending/tv/week' },
+                { title: '⚡ Popular Anime Hits', endpoint: '/discover/tv?with_keywords=210024|287501' },
+                { title: '🍿 Action Blockbusters', endpoint: '/discover/movie?with_genres=28' }
+            ];
+
+            for (let sec of sections) {
+                const data = await fetchTMDB(sec.endpoint);
+                if (data && data.results) {
+                    renderMediaRow(sec.title, data.results);
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function renderMediaRow(title, items) {
+            const container = document.getElementById('dynamic-rows');
+            const rowWrapper = document.createElement('div');
+            rowWrapper.className = 'space-y-4';
+
+            let cardsHtml = items.slice(0, 10).map(item => {
+                const isMovie = item.title ? true : false;
+                const mediaTitle = item.title || item.name;
+                const mediaType = isMovie ? 'movie' : 'tv';
+                const poster = item.poster_path ? `${IMAGE_BASE}${item.poster_path}` : 'https://placehold.co/300x450/0e1117/ffffff?text=No+Poster';
+                const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+
+                return `
+                    <div class="flex-none w-40 md:w-48 glass-card rounded-2xl overflow-hidden group hover:scale-105 transition-all duration-300 border border-white/5 cursor-pointer relative" onclick="playMedia('${mediaType}', ${item.id}, '${escapeQuotes(mediaTitle)}')">
+                        <div class="relative aspect-[2/3] overflow-hidden">
+                            <img src="${poster}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${mediaTitle}" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-transparent opacity-80"></div>
+                            
+                            <!-- Rating Badge -->
+                            <span class="absolute top-2 right-2 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md text-[10px] font-bold text-amber-400 flex items-center gap-1">
+                                <i data-lucide="star" class="w-3 h-3 fill-amber-400"></i> ${rating}
+                            </span>
+
+                            <!-- Watch Play Overlay Button -->
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                                <div class="w-12 h-12 rounded-full bg-brand-600 flex items-center justify-center shadow-neon">
+                                    <i data-lucide="play" class="w-6 h-6 text-white fill-white ml-0.5"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h4 class="text-xs font-bold text-white truncate">${mediaTitle}</h4>
+                            <p class="text-[10px] text-gray-400 capitalize mt-0.5">${mediaType}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            rowWrapper.innerHTML = `
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">${title}</h3>
+                <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                    ${cardsHtml}
+                </div>
+            `;
+            container.appendChild(rowWrapper);
+        }
+
+        function playMedia(type, id, title, season = 1, episode = 1) {
+            currentMedia = { type, id, title, season, episode };
+            document.getElementById('modal-media-title').innerText = title;
+
+            if (type === 'tv' || type === 'anime') {
+                document.getElementById('tv-controls').classList.remove('hidden');
+                populateEpisodeList(season);
+            } else {
+                document.getElementById('tv-controls').classList.add('hidden');
+            }
+
+            updateEmbedSource();
+            document.getElementById('player-modal').classList.remove('hidden');
+        }
+
+        function updateEmbedSource() {
+            const iframe = document.getElementById('embed-iframe');
+            const { type, id, season, episode } = currentMedia;
+
+            let url = '';
+            // VidNest Domain MUST be vidnest.fun as requested
+            if (currentServer === 'vidnest') {
+                url = type === 'movie' ? `https://vidnest.fun/movie/${id}` : `https://vidnest.fun/tv/${id}/${season}/${episode}`;
+            } else if (currentServer === 'vidlink') {
+                url = type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${season}/${episode}`;
+            } else if (currentServer === 'embedsu') {
+                url = type === 'movie' ? `https://embed.su/embed/movie/${id}` : `https://embed.su/embed/tv/${id}/${season}/${episode}`;
+            } else if (currentServer === 'anikoto') {
+                url = `https://anikoto.com/e/${id}`;
+            }
+
+            iframe.src = url;
+        }
+
+        function changeServer(serverName) {
+            currentServer = serverName;
+            
+            // Highlight server button active state
+            ['vidnest', 'vidlink', 'embedsu', 'anikoto'].forEach(s => {
+                const btn = document.getElementById(`srv-${s}`);
+                if (btn) {
+                    if (s === serverName) {
+                        btn.className = 'px-3 py-2 rounded-xl bg-brand-600 text-white font-bold text-xs shadow-neon transition-all';
+                    } else {
+                        btn.className = 'px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-semibold text-xs border border-white/10 transition-all';
+                    }
+                }
+            });
+
+            updateEmbedSource();
+        }
+
+        function populateEpisodeList(season) {
+            const list = document.getElementById('episode-list');
+            list.innerHTML = '';
+            for (let i = 1; i <= 24; i++) {
+                const btn = document.createElement('button');
+                btn.className = `p-2 rounded-lg text-xs font-bold ${i === currentMedia.episode ? 'bg-brand-500 text-white shadow-neon' : 'bg-white/5 text-gray-300 hover:bg-white/10'}`;
+                btn.innerText = `Ep ${i}`;
+                btn.onclick = () => {
+                    currentMedia.episode = i;
+                    populateEpisodeList(season);
+                    updateEmbedSource();
+                };
+                list.appendChild(btn);
+            }
+        }
+
+        function loadEpisodesForSeason() {
+            const select = document.getElementById('season-select');
+            currentMedia.season = parseInt(select.value);
+            currentMedia.episode = 1;
+            populateEpisodeList(currentMedia.season);
+            updateEmbedSource();
+        }
+
+        function closePlayerModal() {
+            document.getElementById('player-modal').classList.add('hidden');
+            document.getElementById('embed-iframe').src = '';
+        }
+
+        function playSportsStream(title, embedUrl) {
+            document.getElementById('modal-media-title').innerText = title;
+            document.getElementById('tv-controls').classList.add('hidden');
+            document.getElementById('embed-iframe').src = embedUrl;
+            document.getElementById('player-modal').classList.remove('hidden');
+        }
+
+        function loadMusicPlaylists() {
+            const grid = document.getElementById('playlist-grid');
+            grid.innerHTML = MUSIC_PLAYLISTS.map((track, idx) => `
+                <div onclick="playMusicTrack(${idx})" class="glass-card rounded-2xl p-3 cursor-pointer group hover:scale-105 transition-all border border-white/5">
+                    <div class="relative aspect-square rounded-xl overflow-hidden mb-2">
+                        <img src="${track.cover}" class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <div class="w-10 h-10 rounded-full bg-brand-cyan text-dark-bg flex items-center justify-center font-bold">
+                                <i data-lucide="play" class="w-5 h-5 fill-dark-bg ml-0.5"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="text-xs font-bold text-white truncate">${track.title}</h4>
+                    <p class="text-[10px] text-gray-400 truncate">${track.artist}</p>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function playMusicTrack(index) {
+            currentTrackIndex = index;
+            const track = MUSIC_PLAYLISTS[index];
+            document.getElementById('music-cover').src = track.cover;
+            document.getElementById('music-track-title').innerText = track.title;
+            document.getElementById('music-track-artist').innerText = track.artist;
+
+            const ytIframe = document.getElementById('youtube-audio-iframe');
+            ytIframe.src = `https://www.youtube.com/embed/${track.ytId}?autoplay=1&enablejsapi=1`;
+
+            document.getElementById('music-player-bar').classList.remove('translate-y-full');
+        }
+
+        function toggleMusicPlay() {
+            const iframe = document.getElementById('youtube-audio-iframe');
+            iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + MUSIC_PLAYLISTS.length) % MUSIC_PLAYLISTS.length;
+            playMusicTrack(currentTrackIndex);
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % MUSIC_PLAYLISTS.length;
+            playMusicTrack(currentTrackIndex);
+        }
+
+        function searchAndPlayMusic() {
+            const query = document.getElementById('music-search-input').value;
+            if (!query) return;
+            const track = {
+                id: Date.now().toString(),
+                title: query,
+                artist: 'RezMusic On-Demand',
+                ytId: 'dQw4w9WgXcQ',
+                cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300'
+            };
+            MUSIC_PLAYLISTS.unshift(track);
+            loadMusicPlaylists();
+            playMusicTrack(0);
+        }
+
+        function closeMusicBar() {
+            document.getElementById('music-player-bar').classList.add('translate-y-full');
+            document.getElementById('youtube-audio-iframe').src = '';
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Hide all main sections
+            document.getElementById('hero-section').classList.toggle('hidden', tab === 'sports' || tab === 'music');
+            document.getElementById('media-view').classList.toggle('hidden', tab === 'sports' || tab === 'music');
+            document.getElementById('sports-view').classList.toggle('hidden', tab !== 'sports');
+            document.getElementById('music-view').classList.toggle('hidden', tab !== 'music');
+
+            // Refresh media view based on active tab
+            if (tab === 'movies') {
+                fetchTMDB('/discover/movie').then(data => renderSingleTab('Popular Movies', data.results));
+            } else if (tab === 'series') {
+                fetchTMDB('/discover/tv').then(data => renderSingleTab('Popular Series', data.results));
+            } else if (tab === 'anime') {
+                fetchTMDB('/discover/tv?with_keywords=210024|287501').then(data => renderSingleTab('Trending Anime', data.results));
+            } else if (tab === 'home') {
+                loadHomeFeed();
+            }
+
+            // Navigation Button styling update
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = 'nav-btn px-4 py-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/5 transition-all';
+            });
+            const activeBtn = document.getElementById(`nav-${tab}`);
+            if (activeBtn) activeBtn.className = 'nav-btn px-4 py-1.5 rounded-full text-white bg-brand-600 shadow-md transition-all';
+        }
+
+        function renderSingleTab(title, items) {
+            const container = document.getElementById('dynamic-rows');
+            container.innerHTML = '';
+            renderMediaRow(title, items);
+        }
+
+        function openSearchModal() { document.getElementById('search-modal').classList.remove('hidden'); }
+        function closeSearchModal() { document.getElementById('search-modal').classList.add('hidden'); }
+
+        async function handleSearchInput(e) {
+            const query = e.target.value.trim();
+            if (query.length < 2) return;
+
+            const data = await fetchTMDB(`/search/multi?query=${encodeURIComponent(query)}`);
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+
+            if (data && data.results) {
+                data.results.forEach(item => {
+                    if (item.media_type !== 'movie' && item.media_type !== 'tv') return;
+                    const title = item.title || item.name;
+                    const poster = item.poster_path ? `${IMAGE_BASE}${item.poster_path}` : 'https://placehold.co/300x450/0e1117/ffffff?text=No+Poster';
+
+                    resultsContainer.innerHTML += `
+                        <div onclick="playMedia('${item.media_type}', ${item.id}, '${escapeQuotes(title)}'); closeSearchModal();" class="glass-card rounded-2xl p-2 cursor-pointer hover:scale-105 transition-all">
+                            <img src="${poster}" class="w-full aspect-[2/3] object-cover rounded-xl mb-2">
+                            <h4 class="text-xs font-bold text-white truncate">${title}</h4>
+                            <p class="text-[10px] text-gray-400 capitalize">${item.media_type}</p>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function toggleWatchlist(item) {
+            const index = watchlist.findIndex(x => x.id === item.id);
+            if (index > -1) {
+                watchlist.splice(index, 1);
+            } else {
+                watchlist.push(item);
+            }
+            localStorage.setItem('rezflix_watchlist', JSON.stringify(watchlist));
+            updateWatchlistBadge();
+        }
+
+        function updateWatchlistBadge() {
+            const badge = document.getElementById('watchlist-badge');
+            if (watchlist.length > 0) {
+                badge.innerText = watchlist.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function openWatchlistModal() {
+            const grid = document.getElementById('watchlist-grid');
+            if (watchlist.length === 0) {
+                grid.innerHTML = '<p class="text-gray-400 text-sm col-span-full">Your Watchlist is currently empty.</p>';
+            } else {
+                grid.innerHTML = watchlist.map(item => `
+                    <div onclick="playMedia('${item.type}', ${item.id}, '${escapeQuotes(item.title)}')" class="glass-card rounded-2xl p-2 cursor-pointer hover:scale-105 transition-all">
+                        <img src="${item.poster}" class="w-full aspect-[2/3] object-cover rounded-xl mb-2">
+                        <h4 class="text-xs font-bold text-white truncate">${item.title}</h4>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('watchlist-modal').classList.remove('hidden');
+        }
+        function closeWatchlistModal() { document.getElementById('watchlist-modal').classList.add('hidden'); }
+
+        function toggleAiModal() {
+            const modal = document.getElementById('ai-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        function sendAiMessage() {
+            const input = document.getElementById('ai-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chat = document.getElementById('ai-chat-body');
+            chat.innerHTML += `<div class="p-3 rounded-2xl bg-brand-purple/20 text-white self-end text-right">${msg}</div>`;
+            input.value = '';
+
+            setTimeout(() => {
+                let response = "I recommend checking out **Arcane** on TV Shows or **Starboy** in RezMusic!";
+                if (msg.toLowerCase().includes('anime')) response = "Top recommended anime: **Solo Leveling**, **Demon Slayer**, and **Jujutsu Kaisen**!";
+                if (msg.toLowerCase().includes('action')) response = "Top recommended action: **John Wick 4**, **Dune: Part Two**, and **Top Gun Maverick**!";
+
+                chat.innerHTML += `<div class="p-3 rounded-2xl bg-white/10 text-gray-200">${response}</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 600);
+        }
+
+        function escapeQuotes(str) {
+            return str ? str.replace(/'/g, "\\'").replace(/"/g, '&quot;') : '';
+        }
+    </script>
+</body>
+</html>
